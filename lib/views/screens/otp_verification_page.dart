@@ -1,3 +1,4 @@
+import 'package:clothes_store/views/screens/update_password_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,6 +7,10 @@ import 'package:clothes_store/views/screens/page_switcher.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class OTPVerificationPage extends StatefulWidget {
+  final bool cameFromRegisterPage;
+
+  const OTPVerificationPage({super.key, this.cameFromRegisterPage = true});
+
   @override
   _OTPVerificationPageState createState() => _OTPVerificationPageState();
 }
@@ -19,13 +24,21 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('Verification', style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w600)),
+        title: Text(
+          'Verification',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
           icon: SvgPicture.asset('assets/icons/Arrow-left.svg'),
-        ), systemOverlayStyle: SystemUiOverlayStyle.light,
+        ),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
       body: ListView(
         shrinkWrap: true,
@@ -50,12 +63,19 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               children: [
                 Text(
                   'OTP Code sent to your email',
-                  style: TextStyle(color: AppColor.secondary.withOpacity(0.7), fontSize: 14),
+                  style: TextStyle(
+                    color: AppColor.secondary.withOpacity(0.7),
+                    fontSize: 14,
+                  ),
                 ),
                 SizedBox(width: 8),
                 Text(
                   'youremail@email.com',
-                  style: TextStyle(color: AppColor.primary, fontSize: 14, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    color: AppColor.primary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
@@ -65,6 +85,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
             length: 4,
             onChanged: (value) {},
             obscureText: false,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             pinTheme: PinTheme(
               shape: PinCodeFieldShape.box,
               borderWidth: 1.5,
@@ -80,15 +101,31 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
             margin: EdgeInsets.only(top: 32, bottom: 16),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => PageSwitcher()));
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) =>
+                            !widget.cameFromRegisterPage
+                                ? UpdatePasswordPage()
+                                : PageSwitcher(),
+                  ),
+                );
               },
               child: Text(
                 'Verify',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'poppins'),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  fontFamily: 'poppins',
+                ),
               ),
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18), backgroundColor: AppColor.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18),
+                backgroundColor: AppColor.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 elevation: 0,
                 shadowColor: Colors.transparent,
               ),
@@ -104,8 +141,12 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              foregroundColor: AppColor.primary, padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18), backgroundColor: AppColor.primarySoft,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              foregroundColor: AppColor.primary,
+              padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18),
+              backgroundColor: AppColor.primarySoft,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: 0,
               shadowColor: Colors.transparent,
             ),

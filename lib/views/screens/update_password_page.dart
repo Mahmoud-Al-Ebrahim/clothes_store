@@ -1,17 +1,19 @@
-import 'package:clothes_store/views/screens/otp_verification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/screens/page_switcher.dart';
-import 'package:clothes_store/views/screens/register_page.dart';
 
-class LoginPage extends StatefulWidget {
+
+
+class UpdatePasswordPage extends StatefulWidget {
+  const UpdatePasswordPage({super.key});
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<UpdatePasswordPage> createState() => _UpdatePasswordPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'Sign in',
+          'Forget Password',
           style: TextStyle(
             color: Colors.black,
             fontSize: 14,
@@ -36,53 +38,15 @@ class _LoginPageState extends State<LoginPage> {
         ),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
-      bottomNavigationBar: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 48,
-        alignment: Alignment.center,
-        child: TextButton(
-          onPressed: () {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (context) => RegisterPage()));
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: AppColor.secondary.withOpacity(0.1),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Dont have an account?',
-                style: TextStyle(
-                  color: AppColor.secondary.withOpacity(0.7),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                ' Sign up',
-                style: TextStyle(
-                  color: AppColor.primary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
       body: ListView(
         shrinkWrap: true,
         padding: EdgeInsets.symmetric(horizontal: 24),
         physics: BouncingScrollPhysics(),
         children: [
-          // Section 1 - Header
           Container(
             margin: EdgeInsets.only(top: 20, bottom: 12),
             child: Text(
-              'Welcome Back Mate ! 😁',
+              'Let\'s Change Password',
               style: TextStyle(
                 color: AppColor.secondary,
                 fontWeight: FontWeight.w700,
@@ -102,37 +66,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          // Section 2 - Form
-          // Email
-          TextField(
-            autofocus: false,
-            decoration: InputDecoration(
-              hintText: 'youremail@email.com',
-              prefixIcon: Container(
-                padding: EdgeInsets.all(12),
-                child: SvgPicture.asset(
-                  'assets/icons/Message.svg',
-                  color: AppColor.primary,
-                ),
-              ),
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 14,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.border, width: 1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.primary, width: 1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              fillColor: AppColor.primarySoft,
-              filled: true,
-            ),
-          ),
-          SizedBox(height: 16),
-          // Password
           TextField(
             autofocus: false,
             obscureText: true,
@@ -169,31 +102,45 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          // Forgot Passowrd
-          Container(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => OTPVerificationPage(cameFromRegisterPage: false,),
-                  ),
-                );
-              },
-              child: Text(
-                'Forgot Password ?',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColor.secondary.withOpacity(0.5),
-                  fontWeight: FontWeight.w700,
+          SizedBox(height: 16),
+          // Password
+          TextField(
+            autofocus: false,
+            obscureText: true,
+            decoration: InputDecoration(
+              hintText: 'Confirm Password',
+              prefixIcon: Container(
+                padding: EdgeInsets.all(12),
+                child: SvgPicture.asset(
+                  'assets/icons/Lock.svg',
+                  color: AppColor.primary,
                 ),
               ),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColor.primary.withOpacity(0.1),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 14,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.border, width: 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.primary, width: 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              fillColor: AppColor.primarySoft,
+              filled: true,
+              //
+              suffixIcon: IconButton(
+                onPressed: () {},
+                icon: SvgPicture.asset(
+                  'assets/icons/Hide.svg',
+                  color: AppColor.primary,
+                ),
               ),
             ),
           ),
-          // Sign In button
+          SizedBox(height:15 ,),
           ElevatedButton(
             onPressed: () {
               Navigator.of(
@@ -201,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
               ).push(MaterialPageRoute(builder: (context) => PageSwitcher()));
             },
             child: Text(
-              'Sign in',
+              'Update',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,

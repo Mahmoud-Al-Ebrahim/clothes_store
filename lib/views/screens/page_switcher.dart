@@ -6,6 +6,7 @@ import 'package:clothes_store/views/screens/home_page.dart';
 import 'package:clothes_store/views/screens/notification_page.dart';
 import 'package:clothes_store/views/screens/profile_page.dart';
 
+
 class PageSwitcher extends StatefulWidget {
   @override
   _PageSwitcherState createState() => _PageSwitcherState();
@@ -39,12 +40,12 @@ class _PageSwitcherState extends State<PageSwitcher> {
             (_selectedIndex == 0)
                 ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Home-active.svg'), label: '')
                 : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Home.svg'), label: ''),
-            (_selectedIndex == 1)
-                ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Category-active.svg'), label: '')
-                : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Category.svg'), label: ''),
-            (_selectedIndex == 2)
-                ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Notification-active.svg'), label: '')
-                : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Notification.svg'), label: ''),
+            // (_selectedIndex == 1)
+            //     ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Category-active.svg'), label: '')
+            //     : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Category.svg'), label: ''),
+            // (_selectedIndex == 2)
+            //     ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Notification-active.svg'), label: '')
+            //     : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Notification.svg'), label: ''),
             (_selectedIndex == 3)
                 ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Profile-active.svg'), label: '')
                 : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Profile.svg'), label: ''),

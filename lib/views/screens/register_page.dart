@@ -158,6 +158,31 @@ class _LoginPageState extends State<RegisterPage> {
             ),
           ),
           SizedBox(height: 16),
+
+          // phone
+          TextField(
+            autofocus: false,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              hintText: '(+963)9900000000',
+              prefixIcon: Container(
+                padding: EdgeInsets.all(12),
+                child: SvgPicture.asset('assets/icons/Call.svg', color: AppColor.primary),
+              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.border, width: 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.primary, width: 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              fillColor: AppColor.primarySoft,
+              filled: true,
+            ),
+          ),
+          SizedBox(height: 16),
           // Password
           TextField(
             autofocus: false,
@@ -232,42 +257,42 @@ class _LoginPageState extends State<RegisterPage> {
               shadowColor: Colors.transparent,
             ),
           ),
-          Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.symmetric(vertical: 16),
-            child: Text(
-              'or continue with',
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            ),
-          ),
-          // SIgn in With Google
-          ElevatedButton(
-            onPressed: () {},
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/Google.svg',
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 16),
-                  child: Text(
-                    'Continue with Google',
-                    style: TextStyle(
-                      color: AppColor.secondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: AppColor.primary, padding: EdgeInsets.symmetric(horizontal: 36, vertical: 12), backgroundColor: AppColor.primarySoft,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              elevation: 0,
-              shadowColor: Colors.transparent,
-            ),
-          ),
+          // Container(
+          //   alignment: Alignment.center,
+          //   margin: EdgeInsets.symmetric(vertical: 16),
+          //   child: Text(
+          //     'or continue with',
+          //     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          //   ),
+          // ),
+          // // SIgn in With Google
+          // ElevatedButton(
+          //   onPressed: () {},
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: [
+          //       SvgPicture.asset(
+          //         'assets/icons/Google.svg',
+          //       ),
+          //       Container(
+          //         margin: EdgeInsets.only(left: 16),
+          //         child: Text(
+          //           'Continue with Google',
+          //           style: TextStyle(
+          //             color: AppColor.secondary,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //         ),
+          //       )
+          //     ],
+          //   ),
+          //   style: ElevatedButton.styleFrom(
+          //     foregroundColor: AppColor.primary, padding: EdgeInsets.symmetric(horizontal: 36, vertical: 12), backgroundColor: AppColor.primarySoft,
+          //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          //     elevation: 0,
+          //     shadowColor: Colors.transparent,
+          //   ),
+          // ),
         ],
       ),
     );

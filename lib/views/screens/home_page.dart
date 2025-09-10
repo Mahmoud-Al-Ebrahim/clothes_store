@@ -1,5 +1,9 @@
 import 'dart:async';
-
+import 'package:clothes_store/blocs/cart_bloc/cart_bloc.dart';
+import 'package:clothes_store/blocs/products_bloc/products_bloc.dart';
+import 'package:clothes_store/views/widgets/loading_indicator/fashion_loader.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:clothes_store/views/screens/cart_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
@@ -7,8 +11,6 @@ import 'package:clothes_store/core/model/Category.dart';
 import 'package:clothes_store/core/model/Product.dart';
 import 'package:clothes_store/core/services/CategoryService.dart';
 import 'package:clothes_store/core/services/ProductService.dart';
-import 'package:clothes_store/views/screens/empty_cart_page.dart';
-import 'package:clothes_store/views/screens/message_page.dart';
 import 'package:clothes_store/views/screens/search_page.dart';
 import 'package:clothes_store/views/widgets/category_card.dart';
 import 'package:clothes_store/views/widgets/custom_icon_button_widget.dart';
@@ -25,6 +27,8 @@ class _HomePageState extends State<HomePage> {
   List<Category> categoryData = CategoryService.categoryData;
   List<Product> productData = ProductService.productData;
 
+  final ValueNotifier<int> currentSelected = ValueNotifier(1);
+
   Timer? flashsaleCountdownTimer;
   Duration flashsaleCountdownDuration = Duration(
     hours: 24 - DateTime.now().hour,
@@ -34,6 +38,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    BlocProvider.of<ProductsBloc>(context).add(GetProductCategoriesEvent());
+    BlocProvider.of<ProductsBloc>(context).add(GetFlashSaleEvent());
+    BlocProvider.of<ProductsBloc>(
+      context,
+    ).add(GetProductsByCategoryEvent(categoryId: 1));
+    BlocProvider.of<CartBloc>(context).add(GetCartEvent());
     super.initState();
     startTimer();
   }
@@ -107,14 +117,16 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Find the best \noutfit for you.',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          height: 150 / 100,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Poppins',
+                      Flexible(
+                        child: Text(
+                          'جِد أفضل صيحات الموضة المناسبة لك',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            height: 150 / 100,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Poppins',
+                          ),
                         ),
                       ),
                       Row(
@@ -123,31 +135,15 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => EmptyCartPage(),
+                                  builder: (context) => CartPage(),
                                 ),
                               );
                             },
-                            value: 0,
                             icon: SvgPicture.asset(
                               'assets/icons/Bag.svg',
                               color: Colors.white,
                             ),
                           ),
-                          // CustomIconButtonWidget(
-                          //   onTap: () {
-                          //     Navigator.of(context).push(
-                          //       MaterialPageRoute(
-                          //         builder: (context) => MessagePage(),
-                          //       ),
-                          //     );
-                          //   },
-                          //   value: 2,
-                          //   margin: EdgeInsets.only(left: 16),
-                          //   icon: SvgPicture.asset(
-                          //     'assets/icons/Chat.svg',
-                          //     color: Colors.white,
-                          //   ),
-                          // ),
                         ],
                       ),
                     ],
@@ -178,73 +174,78 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Category',
+                        'فئات الألبسة',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'View More',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
                     ],
                   ),
                 ),
                 // Category list
-                Container(
-                  margin: EdgeInsets.only(top: 12),
-                  height: 96,
-                  child: ListView.separated(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: categoryData.length,
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    separatorBuilder: (context, index) {
-                      return SizedBox(width: 16);
-                    },
-                    itemBuilder: (context, index) {
-                      return CategoryCard(
-                        data: categoryData[index],
-                        onTap: () {},
-                      );
-                    },
-                  ),
+                ValueListenableBuilder(
+                  valueListenable: currentSelected,
+                  builder: (context, value, child) {
+                    return BlocBuilder<ProductsBloc, ProductsState>(
+                      builder: (context, state) {
+                        return state.getProductCategoriesStatus ==
+                                GetProductCategoriesStatus.loading
+                            ? FashionLoader(color: Colors.white,)
+                            : Container(
+                              margin: EdgeInsets.only(top: 12),
+                              height: 96,
+                              child: ListView.separated(
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                                itemCount:
+                                    state
+                                        .productCategoriesResponseModel
+                                        ?.length ??
+                                    0,
+                                physics: BouncingScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                separatorBuilder: (context, index) {
+                                  return SizedBox(width: 16);
+                                },
+                                itemBuilder: (context, index) {
+                                  return CategoryCard(
+                                    selected:
+                                        value ==
+                                        state
+                                            .productCategoriesResponseModel![index]
+                                            .id,
+                                    data:
+                                        state
+                                            .productCategoriesResponseModel![index],
+                                    onTap: () {
+                                      currentSelected.value =
+                                          state
+                                              .productCategoriesResponseModel![index]
+                                              .id!;
+                                      BlocProvider.of<ProductsBloc>(
+                                        context,
+                                      ).add(
+                                        GetProductsByCategoryEvent(
+                                          categoryId:
+                                              state
+                                                  .productCategoriesResponseModel![index]
+                                                  .id!,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            );
+                      },
+                    );
+                  },
                 ),
               ],
             ),
           ),
-          // Section 3 - banner
-          // Container(
-          //   height: 106,
-          //   padding: EdgeInsets.symmetric(vertical: 16),
-          //   child: ListView.separated(
-          //     padding: EdgeInsets.symmetric(horizontal: 16),
-          //     scrollDirection: Axis.horizontal,
-          //     itemCount: 3,
-          //     separatorBuilder: (context, index) {
-          //       return SizedBox(width: 16);
-          //     },
-          //     itemBuilder: (context, index) {
-          //       return Container(
-          //         width: 230,
-          //         height: 106,
-          //         decoration: BoxDecoration(color: AppColor.primarySoft, borderRadius: BorderRadius.circular(15)),
-          //       );
-          //     },
-          //   ),
-          // ),
 
           // Section 4 - Flash Sale
           Container(
@@ -261,7 +262,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Flash Sale',
+                        'تنزيلات لفترة محدودة',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -269,129 +270,148 @@ class _HomePageState extends State<HomePage> {
                           fontFamily: 'Poppins',
                         ),
                       ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: FlashsaleCountdownTile(digit: hours[0]),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: FlashsaleCountdownTile(digit: hours[1]),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: Text(
-                              ':',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Poppins',
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: FlashsaleCountdownTile(digit: hours[0]),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: FlashsaleCountdownTile(digit: hours[1]),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: Text(
+                                ':',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Poppins',
+                                ),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: FlashsaleCountdownTile(digit: minutes[0]),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: FlashsaleCountdownTile(digit: minutes[1]),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: Text(
-                              ':',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Poppins',
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: FlashsaleCountdownTile(digit: minutes[0]),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: FlashsaleCountdownTile(digit: minutes[1]),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: Text(
+                                ':',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Poppins',
+                                ),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: FlashsaleCountdownTile(digit: seconds[0]),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: FlashsaleCountdownTile(digit: seconds[1]),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: FlashsaleCountdownTile(digit: seconds[0]),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 2.0),
+                              child: FlashsaleCountdownTile(digit: seconds[1]),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 310,
-                        child: ListView(
-                          shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          children: List.generate(
-                            productData.length,
-                            (index) => Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ItemCard(
-                                    product: productData[index],
-                                    titleColor: AppColor.primarySoft,
-                                    priceColor: AppColor.accent,
-                                  ),
-                                  Container(
-                                    width: 180,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0,
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              child: LinearProgressIndicator(
-                                                minHeight: 10,
-                                                value: 0.4,
-                                                color: AppColor.accent,
-                                                backgroundColor:
-                                                    AppColor.border,
-                                              ),
+                BlocBuilder<ProductsBloc, ProductsState>(
+                  builder: (context, state) {
+                    return state.getFlashSaleStatus ==
+                            GetFlashSaleStatus.loading
+                        ? FashionLoader()
+                        : Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 310,
+                                child: ListView(
+                                  shrinkWrap: true,
+                                  physics: BouncingScrollPhysics(),
+                                  scrollDirection: Axis.horizontal,
+                                  children: List.generate(
+                                    state.flashSale.length,
+                                    (index) => Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 16.0,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+
+                                          ItemCard(
+                                            product: state.flashSale[index],
+                                            titleColor: AppColor.primarySoft,
+                                            priceColor: AppColor.accent,
+                                          ),
+                                          Container(
+                                            width: 180,
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8.0,
+                                                        ),
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            10,
+                                                          ),
+                                                      child:
+                                                          LinearProgressIndicator(
+                                                            minHeight: 10,
+                                                            value: 0.4,
+                                                            color:
+                                                                AppColor.accent,
+                                                            backgroundColor:
+                                                                AppColor.border,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Icon(
+                                                  Icons.local_fire_department,
+                                                  color: AppColor.accent,
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ),
-                                        Icon(
-                                          Icons.local_fire_department,
-                                          color: AppColor.accent,
-                                        ),
-                                      ],
+                                          // Row(
+                                          //   children: [
+                                          //     Expanded(
+                                          //       child: Container(
+                                          //         color: Colors.amber,
+                                          //         height: 10,
+                                          //       ),
+                                          //     ),
+                                          //   ],
+                                          // ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  // Row(
-                                  //   children: [
-                                  //     Expanded(
-                                  //       child: Container(
-                                  //         color: Colors.amber,
-                                  //         height: 10,
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                          ],
+                        );
+                  },
                 ),
               ],
             ),
@@ -399,9 +419,9 @@ class _HomePageState extends State<HomePage> {
 
           // Section 5 - product list
           Padding(
-            padding: EdgeInsets.only(left: 16, top: 16),
+            padding: EdgeInsets.only(right: 16, top: 16),
             child: Text(
-              'Todays recommendation...',
+              'توصيات اليوم...',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
@@ -410,16 +430,24 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: List.generate(
-                productData.length,
-                (index) => ItemCard(product: productData[index]),
-              ),
-            ),
+          BlocBuilder<ProductsBloc, ProductsState>(
+            builder: (context, state) {
+              return state.getProductStatus == GetProductStatus.loading
+                  ? FashionLoader()
+                  : Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: List.generate(
+                        state.productsResponseModel?.length ?? 0,
+                        (index) => ItemCard(
+                          product: state.productsResponseModel![index],
+                        ),
+                      ),
+                    ),
+                  );
+            },
           ),
         ],
       ),

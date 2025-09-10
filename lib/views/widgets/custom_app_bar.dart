@@ -8,8 +8,10 @@ class CustomAppBar extends StatelessWidget {
     required this.rightIcon,
     required this.leftOnTap,
     required this.rightOnTap,
+    this.hideRight = false
   });
 
+  final bool hideRight;
   final String title;
   final Function() rightOnTap, leftOnTap;
   final Widget rightIcon, leftIcon;
@@ -38,7 +40,7 @@ class CustomAppBar extends StatelessWidget {
                 child: leftIcon,
               ),
             ),
-            Container(
+             Container(
               width: MediaQuery.of(context).size.width * 5.5 / 10,
               height: 40,
               decoration: BoxDecoration(color: AppColor.primarySoft, borderRadius: BorderRadius.circular(15)),
@@ -48,7 +50,7 @@ class CustomAppBar extends StatelessWidget {
                 style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
-            SizedBox(
+            if(!hideRight) SizedBox(
               width: 40,
               height: 40,
               child: ElevatedButton(

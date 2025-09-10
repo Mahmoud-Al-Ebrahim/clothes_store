@@ -1,15 +1,15 @@
+import 'package:clothes_store/blocs/cart_bloc/cart_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_store/constant/app_color.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CustomIconButtonWidget extends StatelessWidget {
   final Widget icon;
-  final int value;
   final EdgeInsetsGeometry? margin;
   final void Function() onTap;
 
   const CustomIconButtonWidget({
     required this.icon,
-    required this.value,
     required this.onTap,
     this.margin,
   });
@@ -36,8 +36,11 @@ class CustomIconButtonWidget extends StatelessWidget {
               alignment: Alignment.center,
               child: icon,
             ),
-            (value != 0)
-                ? Container(
+            BlocBuilder<CartBloc, CartState>(
+              builder: (context, state) {
+                return state.getCartStatus != GetCartStatus.success ||
+                    (state.cartResponseModel?.length ?? 0) == 0 ? SizedBox
+                    .shrink() : Container(
                   width: 16,
                   height: 16,
                   alignment: Alignment.center,
@@ -46,15 +49,16 @@ class CustomIconButtonWidget extends StatelessWidget {
                     color: AppColor.accent,
                   ),
                   child: Text(
-                    '$value',
+                    '${state.cartResponseModel!.length}',
                     style: TextStyle(
                       color: AppColor.secondary,
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                )
-                : SizedBox(),
+                );
+              },
+            ),
           ],
         ),
       ),

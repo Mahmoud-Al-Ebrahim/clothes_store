@@ -13,7 +13,7 @@ class DummySearchWidget1 extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         height: 40,
         margin: EdgeInsets.only(top: 24),
-        padding: EdgeInsets.only(left: 16),
+        padding: EdgeInsets.only(right: 16),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -28,7 +28,7 @@ class DummySearchWidget1 extends StatelessWidget {
               ),
             ),
             Text(
-              'Find a product...',
+              'ابحث عن منتج...',
               style: TextStyle(color: Colors.grey),
             ),
           ],

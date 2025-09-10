@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/screens/cart_page.dart';
-import 'package:clothes_store/views/screens/message_page.dart';
 import 'package:clothes_store/views/screens/search_page.dart';
 import 'package:clothes_store/views/widgets/custom_icon_button_widget.dart';
 import 'package:clothes_store/views/widgets/dummy_search_widget2.dart';
@@ -47,21 +46,9 @@ class _MainAppBarState extends State<MainAppBar> {
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => CartPage()));
             },
-            value: widget.cartValue,
-            margin: EdgeInsets.only(left: 16),
+            margin: EdgeInsets.only(right: 16),
             icon: SvgPicture.asset(
               'assets/icons/Bag.svg',
-              color: Colors.white,
-            ),
-          ),
-          CustomIconButtonWidget(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessagePage()));
-            },
-            value: widget.chatValue,
-            margin: EdgeInsets.only(left: 16),
-            icon: SvgPicture.asset(
-              'assets/icons/Chat.svg',
               color: Colors.white,
             ),
           ),

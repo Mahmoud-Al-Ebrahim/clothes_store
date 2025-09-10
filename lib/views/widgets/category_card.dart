@@ -1,11 +1,16 @@
+import 'package:clothes_store/models/product_categories_response_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:clothes_store/core/model/Category.dart';
 
 class CategoryCard extends StatelessWidget {
-  final Category data;
+  final CategoriesResponseModel data;
   final Function() onTap;
-  const CategoryCard({required this.data, required this.onTap});
+  final bool selected;
+
+  const CategoryCard({
+    required this.data,
+    required this.onTap,
+    required this.selected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,17 +22,10 @@ class CategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
-          color: (data.featured == true) ? Colors.white.withOpacity(0.10) : Colors.transparent,
+          color: selected ? Colors.white.withOpacity(0.10) : Colors.transparent,
         ),
         child: Column(
           children: [
-            Container(
-              margin: EdgeInsets.only(bottom: 6),
-              child: SvgPicture.asset(
-                '${data.iconUrl}',
-                color: Colors.white,
-              ),
-            ),
             Flexible(
               child: Text(
                 '${data.name}',

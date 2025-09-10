@@ -57,7 +57,7 @@ class NotificationTile extends StatelessWidget {
                     children: [
                       SvgPicture.asset('assets/icons/Time Circle.svg', color: AppColor.secondary.withOpacity(0.7)),
                       Container(
-                        margin: EdgeInsets.only(left: 10),
+                        margin: EdgeInsets.only(right: 10),
                         child: Text(
                           '${data.dateTime}',
                           style: TextStyle(color: AppColor.secondary.withOpacity(0.7), fontSize: 12),

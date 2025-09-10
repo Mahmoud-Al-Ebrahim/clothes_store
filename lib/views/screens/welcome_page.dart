@@ -1,3 +1,5 @@
+import 'package:clothes_store/utils/my_shared_pref.dart';
+import 'package:clothes_store/views/screens/page_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
@@ -36,7 +38,7 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Fashion in your pocket. Find \nyour best outfit here.',
+                  'أحدث صيحات الموضة بين يديك, رفيقك لتبدو بأفضل مايمكن في جميع المناسبات',
                   style: TextStyle(color: AppColor.secondary.withOpacity(0.7), fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
@@ -49,7 +51,8 @@ class WelcomePage extends StatelessWidget {
               margin: EdgeInsets.only(bottom: 16),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+                  String? token = MySharedPref.getToken();
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => token != null ? PageSwitcher() :  LoginPage()));
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18), backgroundColor: AppColor.primary,
@@ -58,7 +61,7 @@ class WelcomePage extends StatelessWidget {
                   shadowColor: Colors.transparent,
                 ),
                 child: Text(
-                  'Get Started',
+                  'ابدأ',
                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'poppins'),
                 ),
               ),

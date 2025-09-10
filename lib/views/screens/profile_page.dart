@@ -1,8 +1,14 @@
+import 'package:clothes_store/utils/my_shared_pref.dart';
+import 'package:clothes_store/views/screens/favorites_page.dart';
+import 'package:clothes_store/views/screens/last_seen_products_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/widgets/main_app_bar_widget.dart';
 import 'package:clothes_store/views/widgets/menu_tile_widget.dart';
+
+import '../../main.dart';
+import '../../utils/api_service.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -13,10 +19,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainAppBar(
-        cartValue: 2,
-        chatValue: 2,
-      ),
+      appBar: MainAppBar(cartValue: 2, chatValue: 2),
       body: ListView(
         shrinkWrap: true,
         physics: BouncingScrollPhysics(),
@@ -50,14 +53,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 Container(
                   margin: EdgeInsets.only(bottom: 4, top: 14),
                   child: Text(
-                    'Nadsya Utari',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
+                    MySharedPref.getFullName()!,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 // Username
                 Text(
-                  '@UtariNad',
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                  '@${MySharedPref.getUserName()!}',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
@@ -71,67 +81,48 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: 16),
+                  margin: EdgeInsets.only(right: 16),
                   child: Text(
-                    'ACCOUNT',
-                    style: TextStyle(color: AppColor.secondary.withOpacity(0.5), letterSpacing: 6 / 100, fontWeight: FontWeight.w600),
+                    'الحساب',
+                    style: TextStyle(
+                      color: AppColor.secondary.withOpacity(0.5),
+                      letterSpacing: 6 / 100,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 MenuTileWidget(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_)=> FavoritesPage()));
+                  },
                   margin: EdgeInsets.only(top: 10),
                   icon: SvgPicture.asset(
                     'assets/icons/Heart.svg',
                     color: AppColor.secondary.withOpacity(0.5),
                   ),
-                  title: 'Wishlist',
-                  subtitle: 'Lorem ipsum Dolor sit Amet',
+                  title: 'المفضلة',
+                  subtitle: 'احفظ ماتفضله في قائمة خاصة',
                 ),
                 MenuTileWidget(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_)=> LastSeenProductsPage()));
+                  },
                   icon: SvgPicture.asset(
                     'assets/icons/Show.svg',
                     color: AppColor.secondary.withOpacity(0.5),
                   ),
-                  title: 'Last Seen',
-                  subtitle: 'Lorem ipsum Dolor sit Amet',
+                  title: 'آخر مارأيته',
+                  subtitle: 'الوصول السريع لآخر المنتجات المزارة',
                 ),
-                MenuTileWidget(
-                  onTap: () {},
-                  icon: SvgPicture.asset(
-                    'assets/icons/Heart.svg',
-                    color: AppColor.secondary.withOpacity(0.5),
-                  ),
-                  title: 'Wishlist',
-                  subtitle: 'Lorem ipsum Dolor sit Amet',
-                ),
-                MenuTileWidget(
-                  onTap: () {},
-                  icon: SvgPicture.asset(
-                    'assets/icons/Bag.svg',
-                    color: AppColor.secondary.withOpacity(0.5),
-                  ),
-                  title: 'Orders',
-                  subtitle: 'Lorem ipsum Dolor sit Amet',
-                ),
-                MenuTileWidget(
-                  onTap: () {},
-                  icon: SvgPicture.asset(
-                    'assets/icons/Wallet.svg',
-                    color: AppColor.secondary.withOpacity(0.5),
-                  ),
-                  title: 'Wallet',
-                  subtitle: 'Lorem ipsum Dolor sit Amet',
-                ),
-                MenuTileWidget(
-                  onTap: () {},
-                  icon: SvgPicture.asset(
-                    'assets/icons/Location.svg',
-                    color: AppColor.secondary.withOpacity(0.5),
-                  ),
-                  title: 'Addresses',
-                  subtitle: 'Lorem ipsum Dolor sit Amet',
-                ),
+                // MenuTileWidget(
+                //   onTap: () {},
+                //   icon: SvgPicture.asset(
+                //     'assets/icons/Bag.svg',
+                //     color: AppColor.secondary.withOpacity(0.5),
+                //   ),
+                //   title: 'الطلبات',
+                //   subtitle: 'جميع طلباتك تجدها هنا',
+                // ),
               ],
             ),
           ),
@@ -145,35 +136,54 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: 16),
+                  margin: EdgeInsets.only(right: 16),
                   child: Text(
-                    'SETTINGS',
-                    style: TextStyle(color: AppColor.secondary.withOpacity(0.5), letterSpacing: 6 / 100, fontWeight: FontWeight.w600),
+                    'الإعدادات',
+                    style: TextStyle(
+                      color: AppColor.secondary.withOpacity(0.5),
+                      letterSpacing: 6 / 100,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 MenuTileWidget(
-                  onTap: () {},
-                  margin: EdgeInsets.only(top: 10),
-                  icon: SvgPicture.asset(
-                    'assets/icons/Filter.svg',
-                    color: AppColor.secondary.withOpacity(0.5),
-                  ),
-                  title: 'Languages',
-                  subtitle: 'Lorem ipsum Dolor sit Amet',
-                ),
-                MenuTileWidget(
-                  onTap: () {},
+                  onTap: () {
+showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text("هل انت متأكد أنك تريد تسجيل الخروج؟"),
+                            actions: [
+                              TextButton(
+                                  onPressed: () async {
+                                        MySharedPref.clear();
+                    ApiService.init();
+                    Navigator.of(context, rootNavigator: true).pushReplacement(
+                      MaterialPageRoute(builder: (_) => MyApp()),
+                    );
+                                  },
+                                  child: Text("نعم")),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("لا"),
+                              ),
+                            ],
+                          );
+               
+                  });},
                   icon: SvgPicture.asset(
                     'assets/icons/Log Out.svg',
                     color: Colors.red,
                   ),
                   iconBackground: Colors.red.shade100,
-                  title: 'Log Out',
+                  title: 'تسجيل الخروج',
                   titleColor: Colors.red,
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

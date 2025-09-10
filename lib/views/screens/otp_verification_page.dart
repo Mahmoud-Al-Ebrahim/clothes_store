@@ -1,3 +1,4 @@
+import 'package:clothes_store/blocs/auth_bloc/auth_bloc.dart';
 import 'package:clothes_store/views/screens/update_password_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,17 +6,34 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/screens/page_switcher.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../utils/show_message.dart';
+import '../widgets/loading_indicator/fashion_loader.dart';
 
 class OTPVerificationPage extends StatefulWidget {
   final bool cameFromRegisterPage;
+  final String email;
 
-  const OTPVerificationPage({super.key, this.cameFromRegisterPage = true});
+  const OTPVerificationPage({
+    super.key,
+    this.cameFromRegisterPage = true,
+    required this.email,
+  });
 
   @override
   _OTPVerificationPageState createState() => _OTPVerificationPageState();
 }
 
 class _OTPVerificationPageState extends State<OTPVerificationPage> {
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<AuthBloc>(context).add(SendOtpEvent(email: widget.email));
+  }
+
+  final TextEditingController code = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +43,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'Verification',
+          'تأكيد الحساب',
           style: TextStyle(
             color: Colors.black,
             fontSize: 14,
@@ -48,7 +66,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
           Container(
             margin: EdgeInsets.only(top: 20, bottom: 8),
             child: Text(
-              'Email verification',
+              'تأكيد البريد الالكتروني',
               style: TextStyle(
                 color: AppColor.secondary,
                 fontWeight: FontWeight.w700,
@@ -62,7 +80,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
             child: Row(
               children: [
                 Text(
-                  'OTP Code sent to your email',
+                  'رمز التحقق تم إرساله إلى البريد الالكتروني',
                   style: TextStyle(
                     color: AppColor.secondary.withOpacity(0.7),
                     fontSize: 14,
@@ -70,7 +88,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 ),
                 SizedBox(width: 8),
                 Text(
-                  'youremail@email.com',
+                  widget.email,
                   style: TextStyle(
                     color: AppColor.primary,
                     fontSize: 14,
@@ -85,6 +103,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
             length: 4,
             onChanged: (value) {},
             obscureText: false,
+            controller: code,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             pinTheme: PinTheme(
               shape: PinCodeFieldShape.box,
@@ -97,59 +116,95 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               inactiveFillColor: AppColor.primarySoft,
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(top: 32, bottom: 16),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder:
-                        (context) =>
-                            !widget.cameFromRegisterPage
-                                ? UpdatePasswordPage()
-                                : PageSwitcher(),
-                  ),
+          BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state.verifyOtpStatus == VerifyOtpStatus.success) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (ctx) => UpdatePasswordPage()),
                 );
-              },
-              child: Text(
-                'Verify',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  fontFamily: 'poppins',
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18),
-                backgroundColor: AppColor.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 0,
-                shadowColor: Colors.transparent,
-              ),
-            ),
+                showMessage('تم التحقق بنجاح ✅', hasError: false);
+              }
+              if (state.verifyOtpStatus == VerifyOtpStatus.failure) {
+                showMessage(state.errorMessage ?? "حدث خطأ ما");
+              }
+            },
+            listenWhen: (p,c)=> p.verifyOtpStatus != c.verifyOtpStatus,
+            builder: (context, state) {
+              return state.verifyOtpStatus == VerifyOtpStatus.loading
+                  ? FashionLoader()
+                  : Container(
+                    margin: EdgeInsets.only(top: 32, bottom: 16),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (code.text.length < 4) {
+                          showMessage("رجاء أدخل كامل الرمز أولاً");
+                          return;
+                        }
+                        BlocProvider.of<AuthBloc>(context).add(
+                          VerifyOtpEvent(email: widget.email, code: code.text),
+                        );
+                      },
+                      child: Text(
+                        'تأكيد الرمز',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          fontFamily: 'poppins',
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 36,
+                          vertical: 18,
+                        ),
+                        backgroundColor: AppColor.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                      ),
+                    ),
+                  );
+            },
           ),
-          ElevatedButton(
-            onPressed: () {},
-            child: Text(
-              'Resend OTP Code',
-              style: TextStyle(
-                color: AppColor.secondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: AppColor.primary,
-              padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18),
-              backgroundColor: AppColor.primarySoft,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 0,
-              shadowColor: Colors.transparent,
-            ),
+          BlocConsumer<AuthBloc, AuthState>(
+            listenWhen: (p,c)=> p.sendOtpStatus != c.sendOtpStatus,
+            listener: (context , state){
+              if(state.sendOtpStatus == SendOtpStatus.failure){
+                showMessage(state.errorMessage ?? "حدث خطأ ما");
+              }
+            },
+            builder: (context, state) {
+              return state.sendOtpStatus == SendOtpStatus.loading
+                  ? FashionLoader()
+                  : ElevatedButton(
+                    onPressed: () {
+                      BlocProvider.of<AuthBloc>(context).add(SendOtpEvent(email: widget.email));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: AppColor.primary,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 36,
+                        vertical: 18,
+                      ),
+                      backgroundColor: AppColor.primarySoft,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Text(
+                      'إعادة إرسال الرمز',
+                      style: TextStyle(
+                        color: AppColor.secondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+            },
           ),
         ],
       ),

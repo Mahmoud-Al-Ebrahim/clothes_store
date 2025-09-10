@@ -5,7 +5,7 @@ import 'package:clothes_store/core/model/Search.dart';
 class SearchHistoryTile extends StatelessWidget {
   const SearchHistoryTile({super.key, required this.data, required this.onTap});
 
-  final SearchHistory data;
+  final String data;
   final void Function() onTap;
 
   @override
@@ -24,7 +24,7 @@ class SearchHistoryTile extends StatelessWidget {
             ),
           ),
         ),
-        child: Text('${data.title}'),
+        child: Text('${data}'),
       ),
     );
   }

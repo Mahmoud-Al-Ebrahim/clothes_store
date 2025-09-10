@@ -32,6 +32,7 @@ class MenuTileWidget extends StatelessWidget {
           border: Border(bottom: BorderSide(color: AppColor.primarySoft, width: 1)),
         ),
         child: Row(
+          spacing: 10,
           children: [
             // Icon Box
             Container(

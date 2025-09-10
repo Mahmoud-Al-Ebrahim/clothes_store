@@ -1,26 +1,49 @@
+import 'package:clothes_store/models/products_response_model.dart';
+import 'package:clothes_store/views/screens/dashboard/add_product_page.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/core/model/Product.dart';
 import 'package:clothes_store/views/screens/product_detail.dart';
 import 'package:clothes_store/views/widgets/rating_tag.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
-class ItemCard extends StatelessWidget {
-  final Product product;
+import '../../blocs/products_bloc/products_bloc.dart';
+import '../../utils/my_shared_pref.dart';
+
+class ItemCard extends StatefulWidget {
+  final ProductsResponseModel product;
   final Color titleColor;
   final Color priceColor;
+  final int? categoryId;
+  final bool fromAdmin;
+
+  final String? info;
 
   ItemCard({
     required this.product,
+    this.fromAdmin = false,
+    this.categoryId,
     this.titleColor = Colors.black,
     this.priceColor = AppColor.primary,
+    this.info,
   });
 
+  @override
+  State<ItemCard> createState() => _ItemCardState();
+}
+
+class _ItemCardState extends State<ItemCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ProductDetail(product: product)));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ProductDetail(product: widget.product),
+          ),
+        );
       },
       child: SizedBox(
         width: MediaQuery.of(context).size.width / 2 - 16 - 8,
@@ -29,17 +52,40 @@ class ItemCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // item image
-            Container(
-              width: MediaQuery.of(context).size.width / 2 - 16 - 8,
-              height: MediaQuery.of(context).size.width / 2 - 16 - 8,
-              padding: EdgeInsets.all(10),
-              alignment: Alignment.topLeft,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                image: DecorationImage(
-                    image: AssetImage(product.image[0]), fit: BoxFit.cover),
-              ),
-              child: RatingTag(value: product.rating),
+            Stack(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width / 2 - 16 - 8,
+                  height: MediaQuery.of(context).size.width / 2 - 16 - 8,
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.topLeft,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    image: DecorationImage(
+                      image: NetworkImage(widget.product.imageUrl!),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child:
+                      RatingTag(value: widget.product.rating?.toDouble() ?? 0),
+                ),
+                // Positioned(
+                //     right: 10,
+                //     top: 10,
+                //     child: IconButton(
+                //   icon: Icon(
+                //     MySharedPref.isFavorite(widget.product.id.toString())
+                //         ? Icons.favorite
+                //         : Icons.favorite_border,
+                //     color: Colors.red,
+                //   ),
+                //   onPressed: () async {
+                //     await MySharedPref.toggleFavorite(widget.product);
+                //     setState(() {});
+                //     // Optionally: setState(() {}); if inside a StatefulWidget to update UI
+                //   },
+                // ))
+              ],
             ),
 
             // item details
@@ -50,35 +96,116 @@ class ItemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
+                    widget.product.name ?? "لا اسم",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: titleColor,
+                      color: widget.titleColor,
                     ),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 2, bottom: 8),
                     child: Text(
-                      '${product.price}SP',
+                      '${widget.product.price}ل.س ',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Poppins',
-                        color: priceColor,
+                        color: widget.priceColor,
                       ),
                     ),
                   ),
-                  Text(
-                    product.storeName,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 10,
+                  if (widget.info != null)
+                    Container(
+                      margin: EdgeInsets.only(top: 2, bottom: 8),
+                      child: Text(
+                        widget.info!,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Poppins',
+                          color: widget.priceColor,
+                        ),
+                      ),
                     ),
-                  )
+                  if (widget.product.categoryName != null)
+                    Text(
+                      widget.product.categoryName!,
+                      style: TextStyle(color: Colors.grey, fontSize: 10),
+                    ),
+                  if (widget.fromAdmin)
+                    Row(spacing: 10, children: [
+                      InkWell(
+                          onTap: () {
+                            showDialog<bool>(
+                              context: context,
+                              barrierDismissible: false,
+                              // user must tap a button
+                              builder: (context) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16)),
+                                  title: const Text(
+                                    "حذف المنتج",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  content: const Text(
+                                    "هل أنت متأكد أنك تريد حذف المنتج؟ لن يتم استعادة المنتج بعد حذفه",
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text("إلغاء",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16)),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        BlocProvider.of<ProductsBloc>(context)
+                                            .add(DeleteProductEvent(
+                                          id: widget.product.id!,
+                                          categoryId: widget.categoryId!,
+                                        ));
+                                        Navigator.pop(context, true);
+                                      },
+                                      child: const Text("حذف",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16)),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          )),
+                      InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => AddEditProductPage(
+                                        product: ProductsResponseModel(),
+                                      )),
+                            );
+                          },
+                          child: Icon(Icons.edit, color: AppColor.primary)),
+                    ])
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -12,7 +12,7 @@ class DummySearchWidget2 extends StatelessWidget {
         onTap: onTap,
         child: Container(
           height: 40,
-          padding: EdgeInsets.only(left: 16),
+          padding: EdgeInsets.only(right: 16),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.1),
             borderRadius: BorderRadius.circular(15),

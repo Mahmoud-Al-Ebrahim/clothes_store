@@ -15,19 +15,26 @@ class OrderSuccessPage extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              margin: EdgeInsets.only(bottom: 16),
+              margin: EdgeInsets.only(bottom: 10),
               width: MediaQuery.of(context).size.width,
               child: ElevatedButton(
                 onPressed: () {},
-                child: Text(
-                  'Your Orders',
-                  style: TextStyle(color: AppColor.secondary, fontWeight: FontWeight.w500),
-                ),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: AppColor.primary, padding: EdgeInsets.symmetric(vertical: 18), backgroundColor: AppColor.border,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  foregroundColor: AppColor.primary,
+                  padding: EdgeInsets.symmetric(vertical: 18),
+                  backgroundColor: AppColor.border,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 0,
                   shadowColor: Colors.transparent,
+                ),
+                child: Text(
+                  'سجل الطلبات',
+                  style: TextStyle(
+                    color: AppColor.secondary,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -35,17 +42,28 @@ class OrderSuccessPage extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => PageSwitcher()));
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => PageSwitcher()),
+                    (route) => false,
+                  );
                 },
-                child: Text(
-                  'Continue Shopping',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'poppins'),
-                ),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 18), backgroundColor: AppColor.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  padding: EdgeInsets.symmetric(vertical: 18),
+                  backgroundColor: AppColor.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 0,
                   shadowColor: Colors.transparent,
+                ),
+                child: Text(
+                  'متابعة التسوق',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    fontFamily: 'poppins',
+                  ),
                 ),
               ),
             ),
@@ -67,7 +85,7 @@ class OrderSuccessPage extends StatelessWidget {
               child: SvgPicture.asset('assets/icons/Success.svg'),
             ),
             Text(
-              'Order Success! 😆',
+              'تمت إضافة الطلب بنجاح 😆',
               style: TextStyle(
                 color: AppColor.secondary,
                 fontSize: 24,
@@ -78,7 +96,7 @@ class OrderSuccessPage extends StatelessWidget {
             Container(
               margin: EdgeInsets.only(top: 8),
               child: Text(
-                'We have received your order',
+                'لقد استلمنا طلبك ',
                 style: TextStyle(color: AppColor.secondary.withOpacity(0.8)),
                 textAlign: TextAlign.center,
               ),

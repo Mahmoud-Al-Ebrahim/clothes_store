@@ -52,7 +52,7 @@ class _NotificationPageState extends State<NotificationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  margin: EdgeInsets.only(left: 16, bottom: 8),
+                  margin: EdgeInsets.only(right: 16, bottom: 8),
                   child: Text(
                     'ORDERS STATUS',
                     style: TextStyle(color: AppColor.secondary.withOpacity(0.5), letterSpacing: 6 / 100, fontWeight: FontWeight.w600),

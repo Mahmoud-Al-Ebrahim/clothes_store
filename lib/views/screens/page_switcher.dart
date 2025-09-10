@@ -6,6 +6,8 @@ import 'package:clothes_store/views/screens/home_page.dart';
 import 'package:clothes_store/views/screens/notification_page.dart';
 import 'package:clothes_store/views/screens/profile_page.dart';
 
+import 'first_suggestion_page.dart';
+
 
 class PageSwitcher extends StatefulWidget {
   @override
@@ -26,8 +28,9 @@ class _PageSwitcherState extends State<PageSwitcher> {
     return Scaffold(
       body: [
         HomePage(),
-        FeedsPage(),
-        NotificationPage(),
+        FirstSuggestionPage(),
+        // FeedsPage(),
+        // NotificationPage(),
         ProfilePage(),
       ][_selectedIndex],
       bottomNavigationBar: Container(
@@ -40,13 +43,13 @@ class _PageSwitcherState extends State<PageSwitcher> {
             (_selectedIndex == 0)
                 ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Home-active.svg'), label: '')
                 : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Home.svg'), label: ''),
-            // (_selectedIndex == 1)
-            //     ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Category-active.svg'), label: '')
-            //     : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Category.svg'), label: ''),
+            (_selectedIndex == 1)
+                ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/clothes_active.svg' ,height: 25,), label: '')
+                : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/clothes_inactive.svg',height: 25,), label: ''),
             // (_selectedIndex == 2)
             //     ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Notification-active.svg'), label: '')
             //     : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Notification.svg'), label: ''),
-            (_selectedIndex == 3)
+            (_selectedIndex == 2)
                 ? BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Profile-active.svg'), label: '')
                 : BottomNavigationBarItem(icon: SvgPicture.asset('assets/icons/Profile.svg'), label: ''),
           ],

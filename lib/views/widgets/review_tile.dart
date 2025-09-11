@@ -1,11 +1,15 @@
+import 'package:clothes_store/blocs/products_bloc/products_bloc.dart';
 import 'package:clothes_store/models/product_reviews_response_model.dart';
+import 'package:clothes_store/utils/my_shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_store/constant/app_color.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ReviewTile extends StatelessWidget {
   final ProductReviewsResponseModel review;
+  final int productId;
 
-  ReviewTile({required this.review});
+  ReviewTile({required this.review, required this.productId});
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +66,31 @@ class ReviewTile extends StatelessWidget {
                     height: 150 / 100,
                   ),
                 ),
+                if (MySharedPref.getUserName() == review.userName)
+                  Row(
+                    spacing: 10,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            BlocProvider.of<ProductsBloc>(context)
+                                .add(DeleteReviewEvent(review.id!, productId));
+                          },
+                          child: Icon(Icons.delete , size: 15, color: Colors.red,)),
+                      InkWell(
+                          onTap: () {
+                            showAddCommentDialog(context , (text) {
+                              BlocProvider.of<ProductsBloc>(context).add(
+                                  EditReviewToProductEvent(
+                                      reviewId:    review.id!,
+                                      productId: productId,
+                                      comment: text
+                                  ));
+                            },comment: review.text);
+
+                          },
+                          child: Icon(Icons.edit, size: 15)),
+                    ],
+                  )
               ],
             ),
           ),
@@ -69,4 +98,52 @@ class ReviewTile extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> showAddCommentDialog(
+      BuildContext context, Function(String) onSubmit,
+      {String? comment}) async {
+    TextEditingController _commentController =
+    TextEditingController(text: comment ?? '');
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('تعديل تعليق'),
+          content: TextField(
+            controller: _commentController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'اكتب رأيك هنا...',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final comment = _commentController.text.trim();
+                if (comment.isNotEmpty) {
+                  onSubmit(comment); // Call the callback
+                  Navigator.of(context).pop(); // Close dialog
+                } else {
+                  // Optionally show an error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('التعليق لايجب أن يكون فارغاً')),
+                  );
+                }
+              },
+              child: Text('حفظ'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

@@ -116,7 +116,7 @@ class _CartPageState extends State<CartPage> {
                             if (location.value != null) {
                               BlocProvider.of<CartBloc>(
                                 context,
-                              ).add(CheckOutEvent());
+                              ).add(CheckOutEvent(location: location.value!));
                             } else {
                               showMessage("رجاء قم بإضافة عنوان للشحن");
                             }
@@ -494,7 +494,18 @@ class _CartPageState extends State<CartPage> {
                         ],
                       ),
                     ),
-                    Container(
+     BlocBuilder<CartBloc, CartState>(
+    buildWhen: (p, c) => p.getCartStatus != c.getCartStatus,
+    builder: (context, state) {
+    double total = 0;
+    int q = 0;
+    state.cartResponseModel?.forEach((item) {
+    total += (item.productPrice! * item.productQuantity!);
+    q += (item.productQuantity!);
+    });
+    return state.getCartStatus == GetCartStatus.loading
+    ? FashionLoader()
+        : Container(
                       width: MediaQuery.of(context).size.width,
                       padding: EdgeInsets.only(
                         right: 16,
@@ -561,7 +572,7 @@ class _CartPageState extends State<CartPage> {
                                 Expanded(
                                   flex: 4,
                                   child: Text(
-                                    '${state.cartResponseModel?.length ?? 0} عناصر ',
+                                    '${q} عناصر ',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: AppColor.secondary.withOpacity(
@@ -586,7 +597,7 @@ class _CartPageState extends State<CartPage> {
                           ),
                         ],
                       ),
-                    ),
+                    );})
                   ],
                 ),
               ),

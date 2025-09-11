@@ -9,8 +9,10 @@ import '../widgets/item_card.dart';
 import '../widgets/loading_indicator/fashion_loader.dart';
 
 class SecondSuggestionPage extends StatefulWidget {
-  const SecondSuggestionPage({super.key});
+  const SecondSuggestionPage({super.key, required this.image});
 
+
+  final String image;
   @override
   State<SecondSuggestionPage> createState() => _SecondSuggestionPageState();
 }
@@ -55,6 +57,22 @@ class _SecondSuggestionPageState extends State<SecondSuggestionPage> {
                 ),]
                         )
                 ),
+          SizedBox(height: 15,),
+          Container(
+            width: MediaQuery.of(context).size.width / 2 - 16 - 8,
+            height: MediaQuery.of(context).size.width / 2 - 16 - 8,
+            padding: EdgeInsets.all(10),
+            alignment: Alignment.topLeft,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              image: DecorationImage(
+                image: NetworkImage(widget.image),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SizedBox(height: 15,),
+
           Expanded(
             child: BlocBuilder<SuggestedClothesBloc, SuggestedClothesState>(
                 builder: (context, state) {
@@ -85,14 +103,15 @@ class _SecondSuggestionPageState extends State<SecondSuggestionPage> {
                           itemBuilder: (context, index) {
                             return  ItemCard(
                               info:
-                              "القياس ${state.suggestedProducts![index].size} \n اللون ${state.suggestedProducts![index].color} \n الستايل ${state.suggestedProducts![index].style}",
+                              "القياس ${state.suggestedProducts![index].size}  \n الستايل ${state.suggestedProducts![index].style}",
                               product: ProductsResponseModel(
-                                id: state.suggestedProducts![index].id,
-                                name: state.suggestedProducts![index].name,
+                                id: state.suggestedProducts![index].productId,
+                                name: state.suggestedProducts![index].name ?? state.suggestedProducts![index].type,
                                 price: state.suggestedProducts![index].price,
                                 imageUrl:
                                 state.suggestedProducts![index].image,
                               ),
+                              color: state.suggestedProducts![index].color,
                             );})
                   );}
             ),

@@ -1,7 +1,10 @@
 import 'package:clothes_store/utils/my_shared_pref.dart';
 import 'package:clothes_store/views/screens/favorites_page.dart';
 import 'package:clothes_store/views/screens/last_seen_products_page.dart';
+import 'package:clothes_store/views/screens/orders_page.dart';
+import 'package:clothes_store/views/screens/update_profile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/widgets/main_app_bar_widget.dart';
@@ -18,6 +21,9 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+
+    print('iiiii ${MySharedPref.getImage()}');
+
     return Scaffold(
       appBar: MainAppBar(cartValue: 2, chatValue: 2),
       body: ListView(
@@ -25,51 +31,59 @@ class _ProfilePageState extends State<ProfilePage> {
         physics: BouncingScrollPhysics(),
         children: [
           // Section 1 - Profile Picture - Username - Name
-          Container(
-            width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/background.jpg'),
-                fit: BoxFit.cover,
+          InkWell(
+            onTap: () async{
+              await Navigator.push(context, MaterialPageRoute(builder: (_)=> UpdateProfilePage()));
+              setState(() {
+
+              });
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/background.jpg') ,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: Column(
-              children: [
-                // Profile Picture
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.grey,
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/pp.jpg'),
-                      fit: BoxFit.cover,
+              child: Column(
+                children: [
+                  // Profile Picture
+                  Container(
+                    width: 96,
+                    height: 96,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: Colors.grey,
+                      image: DecorationImage(
+                        image: MySharedPref.getImage() == null ?  AssetImage('assets/images/pp.jpg') : NetworkImage(MySharedPref.getImage()!),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                // Fullname
-                Container(
-                  margin: EdgeInsets.only(bottom: 4, top: 14),
-                  child: Text(
-                    MySharedPref.getFullName()!,
+                  // Fullname
+                  Container(
+                    margin: EdgeInsets.only(bottom: 4, top: 14),
+                    child: Text(
+                      MySharedPref.getFullName()!,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  // Username
+                  Text(
+                    '@${MySharedPref.getUserName()!}',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 14,
                     ),
                   ),
-                ),
-                // Username
-                Text(
-                  '@${MySharedPref.getUserName()!}',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 14,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           // Section 2 - Account Menu
@@ -114,15 +128,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: 'آخر مارأيته',
                   subtitle: 'الوصول السريع لآخر المنتجات المزارة',
                 ),
-                // MenuTileWidget(
-                //   onTap: () {},
-                //   icon: SvgPicture.asset(
-                //     'assets/icons/Bag.svg',
-                //     color: AppColor.secondary.withOpacity(0.5),
-                //   ),
-                //   title: 'الطلبات',
-                //   subtitle: 'جميع طلباتك تجدها هنا',
-                // ),
+                MenuTileWidget(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_)=> OrdersPage()));
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/icons/Bag.svg',
+                    color: AppColor.secondary.withOpacity(0.5),
+                  ),
+                  title: 'الطلبات',
+                  subtitle: 'جميع طلباتك تجدها هنا',
+                ),
               ],
             ),
           ),

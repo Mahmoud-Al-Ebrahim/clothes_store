@@ -1,4 +1,5 @@
 import 'package:clothes_store/utils/my_shared_pref.dart';
+import 'package:clothes_store/views/screens/dashboard/products_page.dart';
 import 'package:clothes_store/views/screens/page_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -52,7 +53,8 @@ class WelcomePage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   String? token = MySharedPref.getToken();
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => token != null ? PageSwitcher() :  LoginPage()));
+                  bool? isAdmin = MySharedPref.getIsAdmin() ?? false;
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => token != null ? (isAdmin ? ProductsPage() : PageSwitcher()) :  LoginPage()));
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18), backgroundColor: AppColor.primary,

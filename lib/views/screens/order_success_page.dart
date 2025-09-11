@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/screens/page_switcher.dart';
 
+import 'orders_page.dart';
+
 class OrderSuccessPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,9 @@ class OrderSuccessPage extends StatelessWidget {
               margin: EdgeInsets.only(bottom: 10),
               width: MediaQuery.of(context).size.width,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=> OrdersPage()));
+                },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: AppColor.primary,
                   padding: EdgeInsets.symmetric(vertical: 18),

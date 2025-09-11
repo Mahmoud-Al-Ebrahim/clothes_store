@@ -64,6 +64,23 @@ class AddReviewToProductEvent extends ProductsEvent {
   });
 }
 
+class EditReviewToProductEvent extends ProductsEvent {
+  final int productId;
+  final int reviewId;
+  final String comment;
+
+  EditReviewToProductEvent({
+    required this.productId,
+    required this.reviewId,
+    required this.comment,
+  });
+}
+
+class DeleteReviewEvent extends ProductsEvent {
+  final int reviewId;
+  final int productId;
+  DeleteReviewEvent(this.reviewId , this.productId);
+}
 class AddSearchHistoryEvent extends ProductsEvent {
   final String text;
 
@@ -90,6 +107,14 @@ class ClearSearchHistoryEvent extends ProductsEvent {
 
 class GetPopularSearchHistoryEvent extends ProductsEvent {
   GetPopularSearchHistoryEvent();
+}
+
+class GetAllDiscountsEvent extends ProductsEvent {
+  GetAllDiscountsEvent();
+}
+class DeleteDiscountEvent extends ProductsEvent {
+  final int id;
+  DeleteDiscountEvent(this.id);
 }
 
 class AddDiscountEvent extends ProductsEvent {
@@ -120,8 +145,11 @@ class AddProductEvent extends ProductsEvent {
   final String styleCloth;
   final double price;
   final int categoryId;
+  final String? discountId;
   final int quantity;
   final File image;
+  final String size;
+  final String color;
 
   AddProductEvent({
     required this.image,
@@ -134,6 +162,9 @@ class AddProductEvent extends ProductsEvent {
     required this.categoryId,
     required this.quantity,
     required this.styleCloth,
+    required this.size,
+    required this.color,
+    this.discountId
   });
 }
 
@@ -145,6 +176,7 @@ class EditProductEvent extends ProductsEvent {
   final String season;
   final String type;
   final String styleCloth;
+  final String? discountId;
   final double price;
   final int categoryId;
   final int quantity;
@@ -164,5 +196,18 @@ class EditProductEvent extends ProductsEvent {
     required this.categoryId,
     required this.quantity,
     required this.styleCloth,
+    this.discountId
   });
+}
+
+
+class FilteringEvent extends ProductsEvent{
+
+  final double? min;
+  final double? max;
+  final String? color;
+  final String? size;
+  final String? style;
+
+  FilteringEvent(this.min, this.max, this.color, this.size, this.style);
 }

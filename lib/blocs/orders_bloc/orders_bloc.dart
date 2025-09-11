@@ -22,16 +22,16 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   FutureOr<void> _onGetMyOrdersEvent(
       GetMyOrdersEvent event, Emitter<OrdersState> emit) async {
     emit(state.copyWith(getOrdersStatus: GetOrdersStatus.loading));
-    await ApiService.getMethod(endPoint: 'my-orders').then((response) {
+    await ApiService.getMethod(endPoint: 'Cart/GetMyOrders').then((response) {
       log(response.data.toString());
       emit(state.copyWith(
           getOrdersStatus: GetOrdersStatus.success,
-          ordersResponseModel: OrdersResponseModel.fromJson(response.data)));
+          orders: ordersResponseModelFromJson(response.data)));
     }).catchError((error) {
       print(error);
       emit(state.copyWith(
           getOrdersStatus: GetOrdersStatus.failure,
-          errorMessage: error.response.data['message']));
+          errorMessage: error.response.toString()));
     }).onError((error, stackTrace) {
       print(error);
       emit(state.copyWith(
@@ -55,7 +55,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       print(error);
       emit(state.copyWith(
           ordersTransactionStatus: OrdersTransactionStatus.failure,
-          errorMessage: error.response.data['message']));
+          errorMessage: error.response.toString()));
     }).onError((error, stackTrace) {
       print(error);
       emit(state.copyWith(
@@ -87,7 +87,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       print(error.response.data);
       emit(state.copyWith(
           ordersTransactionStatus: OrdersTransactionStatus.failure,
-          errorMessage: error.response.data['message']));
+          errorMessage: error.response.toString()));
     }).onError((error, stackTrace) {
       print(error);
       emit(state.copyWith(

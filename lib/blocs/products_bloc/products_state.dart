@@ -42,12 +42,14 @@ class ProductsState {
 
   final String errorMessage;
 
-  final ProductsResponseModel? productDetails;
+  final ProductDetailsModel? productDetails;
 
   final List<String> searchHistory;
   final List<PopularSearchResponseModel> popularSearchHistory;
   final List<ProductsResponseModel> searchResult;
   final List<ProductsResponseModel> flashSale;
+
+  final List<DiscountsResponseModel> discounts;
 
   ProductsState({
     this.getProductReviewsStatus = GetProductReviewsStatus.loading,
@@ -59,7 +61,7 @@ class ProductsState {
     this.searchProductsStatus = SearchProductsStatus.loading,
     this.searchHistoryTransaction = SearchHistoryTransaction.loading,
     this.getFlashSaleStatus = GetFlashSaleStatus.loading,
-    this.adminTransactionStatus = AdminTransactionStatus.loading,
+    this.adminTransactionStatus = AdminTransactionStatus.init,
     this.favoriteTransactionStatus = const {},
     this.productReviewsResponseModel,
     this.favoritesResponseModel,
@@ -67,6 +69,7 @@ class ProductsState {
     this.popularSearchHistory = const [],
     this.searchResult = const [],
     this.flashSale = const [],
+    this.discounts = const [],
     this.productCategoriesResponseModel,
     this.productsResponseModel,
     this.productDetails,
@@ -87,19 +90,22 @@ class ProductsState {
     final AddProductReviewStatus? addProductReviewStatus,
     final SearchProductsStatus? searchProductsStatus,
     final SearchHistoryTransaction? searchHistoryTransaction,
-    final ProductsResponseModel? productDetails,
+    final ProductDetailsModel? productDetails,
     final GetFlashSaleStatus? getFlashSaleStatus,
     final Map<int , FavoriteTransactionStatus>? favoriteTransactionStatus,
     final List<String>? searchHistory,
     final List<PopularSearchResponseModel>? popularSearchHistory,
     final List<ProductsResponseModel>? searchResult,
     final List<ProductsResponseModel>? flashSale,
+    final List<DiscountsResponseModel>? discounts,
     final String? errorMessage,
   }) {
     return ProductsState(
       errorMessage: errorMessage ?? this.errorMessage,
       searchHistory: searchHistory ?? this.searchHistory,
       searchResult: searchResult ?? this.searchResult,
+      flashSale: flashSale ?? this.flashSale,
+      discounts: discounts ?? this.discounts,
       getFlashSaleStatus: getFlashSaleStatus ?? this.getFlashSaleStatus,
       popularSearchHistory: popularSearchHistory ?? this.popularSearchHistory,
       searchProductsStatus: searchProductsStatus ?? this.searchProductsStatus,

@@ -168,9 +168,10 @@ class _FirstSuggestionPageState extends State<FirstSuggestionPage> {
             builder: (context, index, child) {
               return BlocBuilder<SuggestedClothesBloc, SuggestedClothesState>(
                 builder: (context, state) {
-                  return state.productsPerEventTypeStatus[events[index]] ==
+                  String t = events[index].replaceAll(' ', '');
+                  return state.productsPerEventTypeStatus[t] ==
                               GetProductStatus.loading ||
-                          state.productsPerEventTypeStatus[events[index]] ==
+                          state.productsPerEventTypeStatus[t] ==
                               null
                       ? FashionLoader(color: Colors.white)
                       : Container(
@@ -190,7 +191,7 @@ class _FirstSuggestionPageState extends State<FirstSuggestionPage> {
                               ),
                           itemCount:
                               state
-                                  .productsPerEventType[events[index]]
+                                  .productsPerEventType[t]
                                   ?.length ??
                               0,
                           itemBuilder: (context, innerIndex) {
@@ -202,14 +203,16 @@ class _FirstSuggestionPageState extends State<FirstSuggestionPage> {
                                   GetSuggestedClothesEvent(
                                     productId:
                                         state
-                                            .productsPerEventType[events[index]]![innerIndex]
+                                            .productsPerEventType[t]![innerIndex]
                                             .id!,
                                   ),
                                 );
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => SecondSuggestionPage(),
+                                    builder: (_) => SecondSuggestionPage(image: state
+                                        .productsPerEventType[t]![innerIndex]
+                                          .image! ,),
                                   ),
                                 );
                               },
@@ -227,7 +230,7 @@ class _FirstSuggestionPageState extends State<FirstSuggestionPage> {
                                   ),
                                   child: Image.network(
                                     state
-                                        .productsPerEventType[events[index]]![innerIndex]
+                                        .productsPerEventType[t]![innerIndex]
                                         .image!,
                                     fit: BoxFit.cover,
                                     loadingBuilder: (context, child, progress) {

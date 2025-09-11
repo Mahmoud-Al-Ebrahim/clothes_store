@@ -2,10 +2,10 @@ import 'package:clothes_store/blocs/suggested_bloc/suggested_clothes_bloc.dart';
 import 'package:clothes_store/utils/api_service.dart';
 import 'package:clothes_store/utils/my_shared_pref.dart';
 import 'package:clothes_store/views/screens/dashboard/products_page.dart';
+import 'package:clothes_store/views/screens/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:flutter/services.dart';
-import 'package:clothes_store/views/screens/welcome_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/app_bloc/store_bloc.dart';
 import 'blocs/auth_bloc/auth_bloc.dart';
@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
                 scaffoldBackgroundColor: Colors.white,
                 fontFamily: 'Nunito',
               ),
-              home: ProductsPage(),
+              home: WelcomePage(),
             );
           }
         ),

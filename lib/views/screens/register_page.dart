@@ -37,6 +37,13 @@ class _LoginPageState extends State<RegisterPage> {
   final TextEditingController password = TextEditingController();
   final TextEditingController confirmPassword = TextEditingController();
 
+
+  @override
+  void initState() {
+    regex = RegExp(pattern);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,10 +169,14 @@ class _LoginPageState extends State<RegisterPage> {
           TextField(
             autofocus: false,
             controller: userName,
+            inputFormatters: [
+              FilteringTextInputFormatter.deny(RegExp(r' '))
+            ],
             decoration: InputDecoration(
               hintText: 'اسم المستخدم',
               prefixIcon: Container(
                 padding: EdgeInsets.all(12),
+
                 child: Text(
                   '@',
                   style: TextStyle(
@@ -354,7 +365,7 @@ class _LoginPageState extends State<RegisterPage> {
             listener: (context, state) {
               if (state.createAccountStatus == CreateAccountStatus.success) {
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (ctx) => PageSwitcher()),
+                  MaterialPageRoute(builder: (ctx) => LoginPage()),
                   (route) => false,
                 );
                 showMessage('تم إنشاء الحساب بنجاح بنجاح ✅', hasError: false);
@@ -416,6 +427,14 @@ class _LoginPageState extends State<RegisterPage> {
     }
     if (phone.text.isEmpty) {
       showMessage("رقم الهاتف لايجب أن يكون فارغاً");
+      return;
+    }
+    if (phone.text.length != 12) {
+      showMessage("رقم الهاتف مع رمز البلد يحب أن يكون 12 خانة");
+      return;
+    }
+    if (phone.text.substring(0 , 4) != '9639') {
+      showMessage("رقم الهاتف يجب أن يبدأ ب 9639");
       return;
     }
     if (password.text.length < 8 || confirmPassword.text.length < 8) {

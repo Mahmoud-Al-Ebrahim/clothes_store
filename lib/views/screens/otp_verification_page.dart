@@ -77,7 +77,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
           ),
           Container(
             margin: EdgeInsets.only(bottom: 32),
-            child: Row(
+            child: Column(
               children: [
                 Text(
                   'رمز التحقق تم إرساله إلى البريد الالكتروني',
@@ -98,29 +98,32 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               ],
             ),
           ),
-          PinCodeTextField(
-            appContext: (context),
-            length: 4,
-            onChanged: (value) {},
-            obscureText: false,
-            controller: code,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            pinTheme: PinTheme(
-              shape: PinCodeFieldShape.box,
-              borderWidth: 1.5,
-              borderRadius: BorderRadius.circular(8),
-              fieldHeight: 70,
-              fieldWidth: 70,
-              activeColor: AppColor.primary,
-              inactiveColor: AppColor.border,
-              inactiveFillColor: AppColor.primarySoft,
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: PinCodeTextField(
+              appContext: (context),
+              length: 4,
+              onChanged: (value) {},
+              obscureText: false,
+              controller: code,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              pinTheme: PinTheme(
+                shape: PinCodeFieldShape.box,
+                borderWidth: 1.5,
+                borderRadius: BorderRadius.circular(8),
+                fieldHeight: 70,
+                fieldWidth: 70,
+                activeColor: AppColor.primary,
+                inactiveColor: AppColor.border,
+                inactiveFillColor: AppColor.primarySoft,
+              ),
             ),
           ),
           BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state.verifyOtpStatus == VerifyOtpStatus.success) {
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (ctx) => UpdatePasswordPage()),
+                  MaterialPageRoute(builder: (ctx) => UpdatePasswordPage(email: widget.email,)),
                 );
                 showMessage('تم التحقق بنجاح ✅', hasError: false);
               }

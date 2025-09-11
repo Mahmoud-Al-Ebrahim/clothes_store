@@ -9,7 +9,8 @@ import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.da
 
 class ReviewsPage extends StatefulWidget {
   final List<ProductReviewsResponseModel> reviews;
-  ReviewsPage({required this.reviews});
+  final int productId;
+  ReviewsPage({required this.reviews, required this.productId});
 
   @override
   _ReviewsPageState createState() => _ReviewsPageState();
@@ -73,7 +74,7 @@ class _ReviewsPageState extends State<ReviewsPage> with TickerProviderStateMixin
               shrinkWrap: true,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) => ReviewTile(review: widget.reviews[index]),
+              itemBuilder: (context, index) => ReviewTile(review: widget.reviews[index] , productId: widget.productId,),
               separatorBuilder: (context, index) => SizedBox(height: 16),
               itemCount: widget.reviews.length,
             ),

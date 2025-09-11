@@ -43,10 +43,17 @@ class UpdatePasswordEvent extends AuthEvent {
 
 
 class UpdateProfileEvent extends AuthEvent {
-  final File image;
-
+  final File? image;
+  final String fullName;
+  final String userName;
+  final String email;
+  final String phone;
   UpdateProfileEvent({
-    required this.image,
+    this.image,
+    required this.fullName,
+    required this.userName,
+    required this.email,
+    required this.phone,
   });
 }
 

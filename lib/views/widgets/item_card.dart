@@ -18,6 +18,7 @@ class ItemCard extends StatefulWidget {
   final Color priceColor;
   final int? categoryId;
   final bool fromAdmin;
+  final String? color;
 
   final String? info;
 
@@ -27,7 +28,7 @@ class ItemCard extends StatefulWidget {
     this.categoryId,
     this.titleColor = Colors.black,
     this.priceColor = AppColor.primary,
-    this.info,
+    this.info, this.color,
   });
 
   @override
@@ -96,7 +97,7 @@ class _ItemCardState extends State<ItemCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.product.name ?? "لا اسم",
+                    widget.product.name ?? widget.product.type ??  "لا اسم",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -105,17 +106,65 @@ class _ItemCardState extends State<ItemCard> {
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 2, bottom: 8),
-                    child: Text(
-                      '${widget.product.price}ل.س ',
+                    child: Row(
+                      spacing: 5,
+                      children: [
+                        if(widget.product.orginalPrice != null)...{
+                        Text(
+                          '${widget.product.orginalPrice}ل.س ',
+                          style: TextStyle(
+                            fontSize: 10,
+                            decoration: TextDecoration.lineThrough,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Poppins',
+                            color: widget.priceColor,
+                          ),
+                        ),
+                    Text(
+                      '${widget.product.discountedPrice}ل.س ',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 10,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Poppins',
                         color: widget.priceColor,
-                      ),
+                      ),),
+                        }else if(widget.product.price != widget.product.discountPercentage)...{
+                          Text(
+                            '${widget.product.price}ل.س ',
+                            style: TextStyle(
+                              fontSize: 10,
+                              decoration: widget.product.discountPercentage ==null  ? null : TextDecoration.lineThrough,
+                              fontWeight: FontWeight.w700,
+                              decorationStyle: TextDecorationStyle.solid,
+                              fontFamily: 'Poppins',
+                              color: widget.priceColor,
+                            ),
+                          ),
+                          if(widget.product.discountPercentage !=null)
+                          Text(
+                            '${widget.product.discountPercentage}ل.س ',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Poppins',
+                              color: widget.priceColor,
+                            ),),
+                        }else ...{
+                          Text(
+                            '${widget.product.price}ل.س ',
+                            style: TextStyle(
+                              fontSize: 10,
+                              decoration: TextDecoration.overline,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Poppins',
+                              color: widget.priceColor,
+                            ),
+                          ),
+                        }
+                      ],
                     ),
                   ),
-                  if (widget.info != null)
+                  if (widget.info != null)...{
                     Container(
                       margin: EdgeInsets.only(top: 2, bottom: 8),
                       child: Text(
@@ -128,6 +177,19 @@ class _ItemCardState extends State<ItemCard> {
                         ),
                       ),
                     ),
+                    Row(children: [
+                      Text('اللون: '),
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Color(int.parse('0xff${widget.color?.substring(1)}')),
+                          border: Border.all(color: Colors.black  ,width: 0.5),
+                          shape: BoxShape.circle
+                        ),
+                      )
+                    ],)
+                  },
                   if (widget.product.categoryName != null)
                     Text(
                       widget.product.categoryName!,
@@ -197,7 +259,7 @@ class _ItemCardState extends State<ItemCard> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                   builder: (context) => AddEditProductPage(
-                                        product: ProductsResponseModel(),
+                                        product: widget.product,
                                       )),
                             );
                           },

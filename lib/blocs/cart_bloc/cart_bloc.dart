@@ -17,6 +17,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<AddItemToCartEvent>(_onAddItemToCartEvent);
     on<UpdateItemInCartEvent>(_onUpdateItemInCartEvent);
     on<CheckOutEvent>(_onCheckOutEvent);
+    on<RemoveFromCart>(_onRemoveFromCart);
   }
 
   FutureOr<void> _onGetCartEvent(
@@ -39,7 +40,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           emit(
             state.copyWith(
               getCartStatus: GetCartStatus.failure,
-              errorMessage: error.response.data['message'],
+              errorMessage: error.response.toString(),
             ),
           );
         })
@@ -82,7 +83,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           emit(
             state.copyWith(
               cartTransactionStatus: CartTransactionStatus.failure,
-              errorMessage: error.response.data['message'],
+              errorMessage: error.response.toString(),
             ),
           );
         })
@@ -120,7 +121,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           emit(
             state.copyWith(
               cartTransactionStatus: CartTransactionStatus.failure,
-              errorMessage: error.response.data['message'],
+              errorMessage: error.response.toString(),
             ),
           );
         })
@@ -141,7 +142,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     Emitter<CartState> emit,
   ) async {
     emit(state.copyWith(checkoutStatus: CheckoutStatus.loading));
-    await ApiService.postMethod(endPoint: 'CheckOut')
+    await ApiService.postMethod(endPoint: 'CheckOut' , body: {
+      "shippingAddress"  : event.location
+    })
         .then((response) {
           log(response.data.toString());
           add(GetCartEvent());
@@ -157,7 +160,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           emit(
             state.copyWith(
               checkoutStatus: CheckoutStatus.failure,
-              errorMessage: error.response.data['message'],
+              errorMessage: error.response.toString(),
             ),
           );
         })
@@ -170,5 +173,39 @@ class CartBloc extends Bloc<CartEvent, CartState> {
             ),
           );
         });
+  }
+
+  FutureOr<void> _onRemoveFromCart(RemoveFromCart event, Emitter<CartState> emit)  async{
+    emit(state.copyWith(cartTransactionStatus: CartTransactionStatus.loading));
+    await ApiService.deleteMethod(
+      endPoint: 'Cart/${event.id}',
+    )
+        .then((response) {
+      log(response.data.toString());
+      add(GetCartEvent());
+      emit(
+        state.copyWith(
+          cartTransactionStatus: CartTransactionStatus.success,
+        ),
+      );
+    })
+        .catchError((error) {
+      print(error);
+      emit(
+        state.copyWith(
+          cartTransactionStatus: CartTransactionStatus.failure,
+          errorMessage: error.response.toString(),
+        ),
+      );
+    })
+        .onError((error, stackTrace) {
+      print(error);
+      emit(
+        state.copyWith(
+          cartTransactionStatus: CartTransactionStatus.failure,
+          errorMessage: "حدث خطأ ما!",
+        ),
+      );
+    });
   }
 }

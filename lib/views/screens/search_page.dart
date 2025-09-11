@@ -11,6 +11,8 @@ import 'package:clothes_store/views/widgets/popular_search_card.dart';
 import 'package:clothes_store/views/widgets/search_history_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../widgets/modals/filtering_modal.dart';
+
 class SearchPage extends StatefulWidget {
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -29,6 +31,26 @@ class _SearchPageState extends State<SearchPage> {
     super.initState();
   }
 
+
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => FilterBottomSheet(
+        onApply: (minPrice, maxPrice, style, color, size) {
+          BlocProvider.of<ProductsBloc>(context).add(FilteringEvent(minPrice , maxPrice , color , size , style));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder:
+                  (context) => SearchResultPage(
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +66,11 @@ class _SearchPageState extends State<SearchPage> {
             color: Colors.white,
           ),
         ),
+        actions: [
+          IconButton(onPressed: (){
+            _showFilterSheet(context);
+          }, icon: Icon(Icons.filter_alt_outlined , color: Colors.white,))
+        ],
         title: SizedBox(
           height: 40,
           child: TextField(
@@ -209,7 +236,7 @@ class _SearchPageState extends State<SearchPage> {
                                     builder:
                                         (context) => SearchResultPage(
                                           searchKeyword:
-                                              state.searchHistory[index],
+                                              state.popularSearchHistory[index].term,
                                         ),
                                   ),
                                 );

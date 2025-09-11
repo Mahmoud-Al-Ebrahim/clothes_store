@@ -45,7 +45,7 @@ class GetCartResponseModel {
   factory GetCartResponseModel.fromJson(Map<String, dynamic> json) => GetCartResponseModel(
     productId: json["productId"],
     productType: json["productType"],
-    productName: json["productName"],
+    productName: json["name"],
     productImage: json["productImage"],
     productPrice: json["productPrice"],
     productQuantity: json["productQuantity"],
@@ -54,7 +54,7 @@ class GetCartResponseModel {
   Map<String, dynamic> toJson() => {
     "productId": productId,
     "productType": productType,
-    "productName": productName,
+    "name": productName,
     "productImage": productImage,
     "productPrice": productPrice,
     "productQuantity": productQuantity,

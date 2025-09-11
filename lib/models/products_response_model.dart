@@ -19,6 +19,12 @@ class ProductsResponseModel {
   String? categoryName;
   double? discountPercentage;
 
+  final String? styleCloth;
+  final String? gender;
+  final double? orginalPrice;
+  final double? discountedPrice;
+
+
   ProductsResponseModel({
     this.id,
     this.type,
@@ -29,6 +35,10 @@ class ProductsResponseModel {
     this.imageUrl,
     this.categoryName,
     this.discountPercentage,
+    this.styleCloth,
+    this.gender,
+    this.orginalPrice,
+    this.discountedPrice,
   });
 
   ProductsResponseModel copyWith({
@@ -41,6 +51,7 @@ class ProductsResponseModel {
     String? imageUrl,
     String? categoryName,
     double? discountPercentage,
+
   }) =>
       ProductsResponseModel(
         id: id ?? this.id,
@@ -64,6 +75,10 @@ class ProductsResponseModel {
     imageUrl: json["imageUrl"],
     categoryName: json["categoryName"],
     discountPercentage: json["discountPercentage"],
+    styleCloth: json["styleCloth"],
+    gender: json["gender"],
+    orginalPrice: json["orginalPrice"],
+    discountedPrice: json["discountedPrice"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -76,6 +91,10 @@ class ProductsResponseModel {
     "imageUrl": imageUrl,
     "categoryName": categoryName,
     "discountPercentage": discountPercentage,
+    "styleCloth": styleCloth,
+    "gender": gender,
+    "orginalPrice": orginalPrice,
+    "discountedPrice": discountedPrice,
   };
 }
 

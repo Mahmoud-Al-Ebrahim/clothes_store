@@ -330,87 +330,80 @@ class _HomePageState extends State<HomePage> {
                 ),
                 BlocBuilder<ProductsBloc, ProductsState>(
                   builder: (context, state) {
+                    print(state.flashSale.length);
                     return state.getFlashSaleStatus ==
                             GetFlashSaleStatus.loading
                         ? FashionLoader()
-                        : Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 310,
-                                child: ListView(
-                                  shrinkWrap: true,
-                                  physics: BouncingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  children: List.generate(
-                                    state.flashSale.length,
-                                    (index) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 16.0,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
+                        : SizedBox(
+                      height: 300,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: state.flashSale.length,
+                            physics: BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                              itemBuilder: (context , index) => Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 16.0,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
 
-                                          ItemCard(
-                                            product: state.flashSale[index],
-                                            titleColor: AppColor.primarySoft,
-                                            priceColor: AppColor.accent,
-                                          ),
-                                          Container(
-                                            width: 180,
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 8.0,
-                                                        ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            10,
-                                                          ),
-                                                      child:
-                                                          LinearProgressIndicator(
-                                                            minHeight: 10,
-                                                            value: 0.4,
-                                                            color:
-                                                                AppColor.accent,
-                                                            backgroundColor:
-                                                                AppColor.border,
-                                                          ),
-                                                    ),
-                                                  ),
+                                    ItemCard(
+                                      product: state.flashSale[index],
+                                      titleColor: AppColor.primarySoft,
+                                      priceColor: AppColor.accent,
+                                    ),
+                                    SizedBox(
+                                      width: 180,
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Padding(
+                                              padding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 8.0,
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                BorderRadius.circular(
+                                                  10,
                                                 ),
-                                                Icon(
-                                                  Icons.local_fire_department,
-                                                  color: AppColor.accent,
+                                                child:
+                                                LinearProgressIndicator(
+                                                  minHeight: 10,
+                                                  value: 0.4,
+                                                  color:
+                                                  AppColor.accent,
+                                                  backgroundColor:
+                                                  AppColor.border,
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                          // Row(
-                                          //   children: [
-                                          //     Expanded(
-                                          //       child: Container(
-                                          //         color: Colors.amber,
-                                          //         height: 10,
-                                          //       ),
-                                          //     ),
-                                          //   ],
-                                          // ),
+                                          Icon(
+                                            Icons.local_fire_department,
+                                            color: AppColor.accent,
+                                          ),
                                         ],
                                       ),
                                     ),
-                                  ),
+                                    // Row(
+                                    //   children: [
+                                    //     Expanded(
+                                    //       child: Container(
+                                    //         color: Colors.amber,
+                                    //         height: 10,
+                                    //       ),
+                                    //     ),
+                                    //   ],
+                                    // ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        );
+                    );
                   },
                 ),
               ],

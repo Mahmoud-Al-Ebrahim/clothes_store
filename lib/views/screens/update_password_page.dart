@@ -6,6 +6,7 @@ import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/screens/page_switcher.dart';
 
 import '../../blocs/auth_bloc/auth_bloc.dart';
+import '../../utils/helper_functions.dart';
 import '../../utils/show_message.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +14,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../widgets/loading_indicator/fashion_loader.dart';
 
 class UpdatePasswordPage extends StatefulWidget {
-  const UpdatePasswordPage({super.key});
+  const UpdatePasswordPage({super.key, required this.email});
+
+  final String email;
 
   @override
   State<UpdatePasswordPage> createState() => _UpdatePasswordPageState();
@@ -22,6 +25,9 @@ class UpdatePasswordPage extends StatefulWidget {
 class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   final ValueNotifier<bool> showPassword = ValueNotifier(false);
   final ValueNotifier<bool> showPassword2 = ValueNotifier(false);
+
+  final TextEditingController password = TextEditingController();
+  final TextEditingController confirm = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +87,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
               return TextField(
                 autofocus: false,
                 obscureText: value,
+                controller: password,
                 decoration: InputDecoration(
                   hintText: 'كلمة المرور الجديدة',
                   prefixIcon: Container(
@@ -126,6 +133,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
               return TextField(
                 autofocus: false,
                 obscureText: value,
+                controller: confirm,
                 decoration: InputDecoration(
                   hintText: "تأكيد كلمة المرور",
                   prefixIcon: Container(
@@ -184,19 +192,8 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                   ? FashionLoader()
                   : ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => PageSwitcher()),
-                      );
+                      onTap();
                     },
-                    child: Text(
-                      'Update',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        fontFamily: 'poppins',
-                      ),
-                    ),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(
                         horizontal: 36,
@@ -209,11 +206,38 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
                       elevation: 0,
                       shadowColor: Colors.transparent,
                     ),
+                    child: Text(
+                      'Update',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        fontFamily: 'poppins',
+                      ),
+                    ),
                   );
             },
           ),
         ],
       ),
     );
+  }
+
+  onTap()async{
+    if (password.text.length < 8 || confirm.text.length < 8) {
+      showMessage("كلمة المرور يجب أن تكون على الأقل 8 خانات");
+      return;
+    }
+    if (password.text != confirm.text) {
+      showMessage("كلمات المرور غير متطابقة");
+      return;
+    }
+    if (await HelperFunctions.lostInternetConnection()) {
+    showMessage("تحقق من اتصالك بالانترنت");
+    return;
+    }
+    BlocProvider.of<AuthBloc>(
+    context,
+    ).add(UpdatePasswordEvent(password: password.text, email: widget.email));
   }
 }

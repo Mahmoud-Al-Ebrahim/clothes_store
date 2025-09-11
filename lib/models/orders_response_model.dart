@@ -4,215 +4,86 @@
 
 import 'dart:convert';
 
-import 'package:clothes_store/models/products_response_model.dart';
+List<OrdersResponseModel> ordersResponseModelFromJson(List<dynamic> data) => List<OrdersResponseModel>.from(data.map((x) => OrdersResponseModel.fromJson(x)));
 
-import '../core/model/Product.dart';
-
-OrdersResponseModel ordersResponseModelFromJson(String str) =>
-    OrdersResponseModel.fromJson(json.decode(str));
-
-String ordersResponseModelToJson(OrdersResponseModel data) =>
-    json.encode(data.toJson());
+String ordersResponseModelToJson(List<OrdersResponseModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class OrdersResponseModel {
-  bool? success;
-  List<OrderItem>? orders;
+  int? id;
+  double? totalPrice;
+  DateTime? createAt;
+  String? shippingAddress;
+  List<Item>? items;
 
   OrdersResponseModel({
-    this.success,
-    this.orders,
-  });
-
-  OrdersResponseModel copyWith({
-    bool? success,
-    List<OrderItem>? orders,
-  }) =>
-      OrdersResponseModel(
-        success: success ?? this.success,
-        orders: orders ?? this.orders,
-      );
-
-  factory OrdersResponseModel.fromJson(Map<String, dynamic> json) =>
-      OrdersResponseModel(
-        success: json["success"],
-        orders: json["data"] == null
-            ? []
-            : List<OrderItem>.from(
-                json["data"]!.map((x) => OrderItem.fromJson(x))),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "success": success,
-        "data": orders == null
-            ? []
-            : List<dynamic>.from(orders!.map((x) => x.toJson())),
-      };
-}
-
-class OrderItem {
-  int? id;
-  int? userId;
-  String? fullName;
-  String? phoneNumber;
-  String? shippingCo;
-  String? shippingState;
-  String? shippingBranch;
-  String? status;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  List<OrderDetail>? orderDetails;
-
-  OrderItem({
     this.id,
-    this.userId,
-    this.fullName,
-    this.phoneNumber,
-    this.shippingCo,
-    this.shippingState,
-    this.shippingBranch,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-    this.orderDetails,
+    this.totalPrice,
+    this.createAt,
+    this.shippingAddress,
+    this.items,
   });
 
-  OrderItem copyWith({
-    int? id,
-    int? userId,
-    String? fullName,
-    String? phoneNumber,
-    String? shippingCo,
-    String? shippingState,
-    String? shippingBranch,
-    String? status,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    List<OrderDetail>? orderDetails,
-  }) =>
-      OrderItem(
-        id: id ?? this.id,
-        userId: userId ?? this.userId,
-        fullName: fullName ?? this.fullName,
-        phoneNumber: phoneNumber ?? this.phoneNumber,
-        shippingCo: shippingCo ?? this.shippingCo,
-        shippingState: shippingState ?? this.shippingState,
-        shippingBranch: shippingBranch ?? this.shippingBranch,
-        status: status ?? this.status,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        orderDetails: orderDetails ?? this.orderDetails,
-      );
-
-  factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
-        id: json["id"],
-        userId: json["user_id"],
-        fullName: json["full_name"],
-        phoneNumber: json["phone_number"],
-        shippingCo: json["shipping_co"],
-        shippingState: json["shipping_state"],
-        shippingBranch: json["shipping_branch"],
-        status: json["status"],
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-        orderDetails: json["order_details"] == null
-            ? []
-            : List<OrderDetail>.from(
-                json["order_details"]!.map((x) => OrderDetail.fromJson(x))),
-      );
+  factory OrdersResponseModel.fromJson(Map<String, dynamic> json) => OrdersResponseModel(
+    id: json["id"],
+    totalPrice: json["totalPrice"],
+    createAt: json["createAt"] == null ? null : DateTime.parse(json["createAt"]),
+    shippingAddress: json["shippingAddress"],
+    items: json["items"] == null ? [] : List<Item>.from(json["items"]!.map((x) => Item.fromJson(x))),
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "user_id": userId,
-        "full_name": fullName,
-        "phone_number": phoneNumber,
-        "shipping_co": shippingCo,
-        "shipping_state": shippingState,
-        "shipping_branch": shippingBranch,
-        "status": status,
-        "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
-        "order_details": orderDetails == null
-            ? []
-            : List<dynamic>.from(orderDetails!.map((x) => x.toJson())),
-      };
+    "id": id,
+    "totalPrice": totalPrice,
+    "createAt": createAt?.toIso8601String(),
+    "shippingAddress": shippingAddress,
+    "items": items == null ? [] : List<dynamic>.from(items!.map((x) => x.toJson())),
+  };
 }
 
-class OrderDetail {
+class Item {
   int? id;
-  int? orderId;
   int? productId;
-  double? quantity;
-  double? unitPrice;
-  String? itemDetails;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  Product? product;
+  String? productName;
+  int? quantity;
+  double? price;
+  String? size;
+  String? color;
+  String? imageUrl;
+  double? discountedPrice;
 
-  OrderDetail({
+  Item({
     this.id,
-    this.orderId,
     this.productId,
+    this.productName,
     this.quantity,
-    this.unitPrice,
-    this.itemDetails,
-    this.createdAt,
-    this.updatedAt,
-    this.product,
+    this.price,
+    this.size,
+    this.color,
+    this.imageUrl,
+    this.discountedPrice,
   });
 
-  OrderDetail copyWith({
-    int? id,
-    int? orderId,
-    int? productId,
-    double? quantity,
-    double? unitPrice,
-    String? itemDetails,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    Product? product,
-  }) =>
-      OrderDetail(
-        id: id ?? this.id,
-        orderId: orderId ?? this.orderId,
-        productId: productId ?? this.productId,
-        quantity: quantity ?? this.quantity,
-        unitPrice: unitPrice ?? this.unitPrice,
-        itemDetails: itemDetails ?? this.itemDetails,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        product: product ?? this.product,
-      );
-
-  factory OrderDetail.fromJson(Map<String, dynamic> json) => OrderDetail(
-        id: json["id"],
-        orderId: json["order_id"],
-        productId: json["product_id"],
-        quantity: json["quantity"] is double ? json["quantity"] : json["quantity"].toDouble(),
-        unitPrice: json["unit_price"] is double ? json["unit_price"] : json["unit_price"].toDouble(),
-        itemDetails: json["item_details"],
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-        product:
-            json["product"] == null ? null : Product.fromJson(json["product"]),
-      );
+  factory Item.fromJson(Map<String, dynamic> json) => Item(
+    id: json["id"],
+    productId: json["productId"],
+    productName: json["productName"],
+    quantity: json["quantity"],
+    price: json["price"],
+    size: json["size"],
+    color: json["color"],
+    imageUrl: json["imageUrl"],
+    discountedPrice: json["discountedPrice"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "order_id": orderId,
-        "product_id": productId,
-        "quantity": quantity,
-        "unit_price": unitPrice,
-        "item_details": itemDetails,
-        "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
-      };
+    "id": id,
+    "productId": productId,
+    "productName": productName,
+    "quantity": quantity,
+    "price": price,
+    "size": size,
+    "color": color,
+    "imageUrl": imageUrl,
+    "discountedPrice": discountedPrice,
+  };
 }
-

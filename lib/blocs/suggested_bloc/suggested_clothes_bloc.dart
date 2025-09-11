@@ -27,7 +27,7 @@ class SuggestedClothesBloc
     Map<String, GetProductStatus> statuses = Map.of(
       state.productsPerEventTypeStatus,
     );
-    if (statuses[event.eventType] == GetProductStatus.success) return;
+    // if (statuses[event.eventType] == GetProductStatus.success) return;
 
     statuses[event.eventType] = GetProductStatus.loading;
 
@@ -64,7 +64,7 @@ class SuggestedClothesBloc
           emit(
             state.copyWith(
               productsPerEventTypeStatus: statuses,
-              errorMessage: error.response.data['message'],
+              errorMessage: error.response.toString(),
             ),
           );
         })
@@ -114,7 +114,7 @@ class SuggestedClothesBloc
       emit(
         state.copyWith(
           getSuggestedProducts: GetSuggestedProducts.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     })

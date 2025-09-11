@@ -26,6 +26,9 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
   late TextEditingController _descriptionController;
   late TextEditingController _priceController;
   late TextEditingController _quantityController;
+  late TextEditingController _discountController;
+  late TextEditingController _sizeController;
+  late TextEditingController _colorController;
   late final ValueNotifier<int> currentSelected;
 
   File? _imageFile;
@@ -47,10 +50,13 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
 
     _quantityController =
         TextEditingController(text: widget.product?.name ?? "");
+    _discountController =  TextEditingController();
+    _sizeController =  TextEditingController();
+    _colorController =  TextEditingController();
     _descriptionController =
         TextEditingController(text: widget.product?.description ?? "");
     _priceController =
-        TextEditingController(text: widget.product?.price.toString() ?? "");
+        TextEditingController(text: (widget.product?.price ?? "").toString());
   }
 
   Future<void> _pickImage() async {
@@ -69,37 +75,40 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
       );
       return;
     }
-    if (_formKey.currentState!.validate()) {
-      BlocProvider.of<ProductsBloc>(context).add(widget.product == null
-          ? AddProductEvent(
-              name: _nameController.text,
-              description: _descriptionController.text,
-              price: double.tryParse(_priceController.text) ?? 0,
-              categoryId: currentSelected.value,
-              quantity: int.tryParse(_quantityController.text) ?? 0,
-              image: _imageFile!,
-              gender: _gender ?? "",
-              season: _season ?? "",
-              type: _type ?? "",
-              styleCloth: _styleCloth ?? "",
-            )
-          : EditProductEvent(
-              imageUrl: widget.product!.imageUrl!,
-              id: widget.product!.id!,
-              name: _nameController.text,
-              description: _descriptionController.text,
-              price: double.tryParse(_priceController.text) ?? 0,
-              categoryId: currentSelected.value,
-              quantity: int.tryParse(_quantityController.text) ?? 0,
-              image: _imageFile!,
-              gender: _gender ?? "",
-              season: _season ?? "",
-              type: _type ?? "",
-              styleCloth: _styleCloth ?? "",
-            ));
+    if (_formKey.currentState!.validate() && widget.product == null) {
+      BlocProvider.of<ProductsBloc>(context).add(AddProductEvent(
+        name: _nameController.text,
+        description: _descriptionController.text,
+        price: double.tryParse(_priceController.text) ?? 0,
+        categoryId: currentSelected.value,
+        quantity: int.tryParse(_quantityController.text) ?? 0,
+        image: _imageFile!,
+        gender: _gender ?? "",
+        season: _season ?? "",
+        type: _type ?? "",
+        color: _colorController.text,
+        size: _sizeController.text,
+        styleCloth: _styleCloth ?? "",
+      ));
+    }else{
+      BlocProvider.of<ProductsBloc>(context).add(EditProductEvent(
+        imageUrl: widget.product!.imageUrl!,
+        id: widget.product!.id!,
+        name: _nameController.text,
+        description: _descriptionController.text,
+        price: double.tryParse(_priceController.text) ?? 0,
+        categoryId: currentSelected.value,
+        quantity: int.tryParse(_quantityController.text) ?? 0,
+        image: _imageFile,
+        gender: _gender ?? "",
+        season: _season ?? "",
+        type: _type ?? "",
+        styleCloth: _styleCloth ?? "",
+      ));
 
-      Navigator.pop(context);
+
     }
+    Navigator.pop(context);
   }
 
   @override
@@ -240,7 +249,24 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
                 decoration: const InputDecoration(labelText: "السعر"),
                 keyboardType: TextInputType.number,
               ),
+
+              TextFormField(
+                controller: _discountController,
+                decoration: const InputDecoration(labelText: "الخصم"),
+                keyboardType: TextInputType.number,
+              ),
+
               if (widget.product == null) ...{
+                TextFormField(
+                  controller: _colorController,
+                  decoration: const InputDecoration(labelText: "اللون"),
+                  keyboardType: TextInputType.text,
+                ),
+                TextFormField(
+                  controller: _sizeController,
+                  decoration: const InputDecoration(labelText: "القياس"),
+                  keyboardType: TextInputType.text,
+                ),
                 TextFormField(
                   controller: _quantityController,
                   decoration: const InputDecoration(labelText: "الكمية"),

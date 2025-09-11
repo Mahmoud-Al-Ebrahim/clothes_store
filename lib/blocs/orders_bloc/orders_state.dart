@@ -9,27 +9,27 @@ class OrdersState {
   final GetOrdersStatus getOrdersStatus;
 
   final String errorMessage;
-  final OrdersResponseModel? ordersResponseModel;
+  final List<OrdersResponseModel> orders;
 
   OrdersState({
     this.getOrdersStatus = GetOrdersStatus.init,
     this.ordersTransactionStatus = OrdersTransactionStatus.init,
     this.errorMessage = '',
-    this.ordersResponseModel,
+    this.orders = const [],
   });
 
   OrdersState copyWith({
     final OrdersTransactionStatus? ordersTransactionStatus,
     final GetOrdersStatus? getOrdersStatus,
     final String? errorMessage,
-    final OrdersResponseModel? ordersResponseModel,
+    final List<OrdersResponseModel>? orders,
   }) {
     return OrdersState(
       getOrdersStatus: getOrdersStatus ?? this.getOrdersStatus,
       ordersTransactionStatus:
           ordersTransactionStatus ?? this.ordersTransactionStatus,
       errorMessage: errorMessage ?? this.errorMessage,
-      ordersResponseModel: ordersResponseModel ?? this.ordersResponseModel,
+      orders: orders ?? this.orders,
     );
   }
 }

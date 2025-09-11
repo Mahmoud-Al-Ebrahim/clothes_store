@@ -1,3 +1,4 @@
+import 'package:clothes_store/utils/my_shared_pref.dart';
 import 'package:clothes_store/views/screens/dashboard/products_page.dart';
 import 'package:clothes_store/views/screens/otp_verification_page.dart';
 import 'package:clothes_store/views/widgets/loading_indicator/fashion_loader.dart';
@@ -58,12 +59,6 @@ class _LoginPageState extends State<LoginPage> {
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: SvgPicture.asset('assets/icons/Arrow-left.svg'),
         ),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
@@ -249,6 +244,7 @@ class _LoginPageState extends State<LoginPage> {
             listener: (context, state) {
               if (state.loginStatus == LoginStatus.success) {
                 bool isAdmin = BlocProvider.of<AuthBloc>(context).userModel?.user?.isAdmin ?? false;
+                MySharedPref.saveIsAdmin(true);
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (ctx) =>  isAdmin ? ProductsPage() : PageSwitcher()),
                   (route) => false,

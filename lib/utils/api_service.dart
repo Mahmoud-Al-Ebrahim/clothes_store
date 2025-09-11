@@ -36,6 +36,7 @@ class ApiService {
       {required String endPoint,
       Map<String, dynamic>? queryParameters,
         String? bodyAsString,
+        dynamic form ,
       Map<String, dynamic>? body}) async {
     Uri uri = Uri(
       host: baseUri.host,
@@ -43,12 +44,13 @@ class ApiService {
       path: prefix + endPoint,
       queryParameters: queryParameters,
     );
-     return _dio.postUri(uri, data: bodyAsString ?? body);
+     return _dio.postUri(uri, data: form ?? bodyAsString ?? body);
   }
 
   static Future<Response> putMethod(
       {required String endPoint,
       Map<String, dynamic>? queryParameters,
+        String? bodyAsString,
       Map<String, dynamic>? body}) async {
     Uri uri = Uri(
       host: baseUri.host,
@@ -56,7 +58,7 @@ class ApiService {
       path: prefix + endPoint,
       queryParameters: queryParameters,
     );
-    return _dio.putUri(uri, data: body);
+    return _dio.putUri(uri, data: bodyAsString ?? body);
   }
 
   static Future<Response> getMethod(

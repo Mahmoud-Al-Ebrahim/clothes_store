@@ -2,14 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:clothes_store/models/discounts_response_modell.dart';
+import 'package:http_parser/http_parser.dart';
+
 import 'package:clothes_store/models/popular_search_response_model.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:dio/dio.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:clothes_store/models/favorites_response_model.dart';
 import 'package:clothes_store/models/product_categories_response_model.dart';
 import 'package:clothes_store/models/product_reviews_response_model.dart';
 import 'package:clothes_store/models/products_response_model.dart';
+import 'package:mime_type/mime_type.dart';
+import '../../models/product_details_model.dart';
 import '../../utils/api_service.dart';
 
 part 'products_event.dart';
@@ -30,6 +35,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<GetProductByIdEvent>(_onGetProductByIdEvent);
 
     on<AddSearchHistoryEvent>(_onAddSearchHistoryEvent);
+    on<FilteringEvent>(_onFilteringEvent);
     on<SearchProductsEvent>(_onSearchProductsEvent);
     on<ClearSearchHistoryEvent>(_onClearSearchHistoryEvent);
     on<GetSearchHistoryEvent>(_onGetSearchHistoryEvent);
@@ -40,6 +46,13 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<AddDiscountEvent>(_onAddDiscountEvent);
     on<AddProductEvent>(_onAddProductEvent);
     on<EditProductEvent>(_onEditProductEvent);
+
+    on<DeleteReviewEvent>(_onDeleteReviewEvent);
+    on<EditReviewToProductEvent>(_onEditReviewToProductEvent);
+
+
+    on<GetAllDiscountsEvent>(_onGetAllDiscountsEvent);
+    on<DeleteDiscountEvent>(_onDeleteDiscountEvent);
   }
 
   FutureOr<void> _onGetProductsByCategoryEvent(
@@ -65,7 +78,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           getProductStatus: GetProductStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -104,7 +117,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           getFavoritesProductStatus: GetFavoritesProductStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -145,7 +158,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           getProductCategoriesStatus: GetProductCategoriesStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -183,7 +196,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           getProductReviewsStatus: GetProductReviewsStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -220,7 +233,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           addProductReviewStatus: AddProductReviewStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -268,7 +281,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           favoriteTransactionStatus: statuses,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -315,7 +328,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           favoriteTransactionStatus: statuses,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -347,7 +360,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           getProductDetailsStatus: GetProductDetailsStatus.success,
-          productDetails: ProductsResponseModel.fromJson(response.data),
+          productDetails: ProductDetailsModel.fromJson(response.data),
         ),
       );
     }).catchError((error) {
@@ -355,7 +368,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           getProductDetailsStatus: GetProductDetailsStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -374,7 +387,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     Emitter<ProductsState> emit,
   ) async {
     emit(state.copyWith(searchProductsStatus: SearchProductsStatus.loading));
-    await ApiService.getMethod(
+    await ApiService.postMethod(
         endPoint: 'Product/SearchProducts',
         queryParameters: {"query": event.text}).then((response) {
       log(response.data.toString());
@@ -390,7 +403,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           searchProductsStatus: SearchProductsStatus.failure,
-          errorMessage: error.response.data['message'],
+          searchResult: [],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -398,6 +412,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           searchProductsStatus: SearchProductsStatus.failure,
+          searchResult: [],
           errorMessage: "حدث خطأ ما!",
         ),
       );
@@ -425,7 +440,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           searchHistoryTransaction: SearchHistoryTransaction.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -463,7 +478,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           searchHistoryTransaction: SearchHistoryTransaction.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -501,7 +516,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           searchHistoryTransaction: SearchHistoryTransaction.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -517,32 +532,37 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
   FutureOr<void> _onGetFlashSaleEvent(
       GetFlashSaleEvent event, Emitter<ProductsState> emit) async {
-    emit(state.copyWith(getProductStatus: GetProductStatus.loading));
+    emit(state.copyWith(getFlashSaleStatus: GetFlashSaleStatus.loading));
     await ApiService.getMethod(
       endPoint: 'Product/flash-sale',
     ).then((response) {
       log(response.data.toString());
-      emit(
-        state.copyWith(
-          getProductStatus: GetProductStatus.success,
-          productsResponseModel: productsResponseModelFromJson(
-            response.data,
+      try {
+        emit(
+          state.copyWith(
+            getFlashSaleStatus: GetFlashSaleStatus.success,
+            flashSale: productsResponseModelFromJson(
+              response.data,
+            ),
           ),
-        ),
-      );
+        );
+      }catch(e , st){
+        print(e);
+        print(st);
+      }
     }).catchError((error) {
       log(error.toString());
       emit(
         state.copyWith(
-          getProductStatus: GetProductStatus.failure,
-          errorMessage: error.response.data['message'],
+          getFlashSaleStatus: GetFlashSaleStatus.failure,
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
       print(error);
       emit(
         state.copyWith(
-          getProductStatus: GetProductStatus.failure,
+          getFlashSaleStatus: GetFlashSaleStatus.failure,
           errorMessage: "حدث خطأ ما!",
         ),
       );
@@ -567,7 +587,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           searchHistoryTransaction: SearchHistoryTransaction.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -602,7 +622,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           adminTransactionStatus: AdminTransactionStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -625,10 +645,11 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     );
     await ApiService.postMethod(endPoint: 'Product/AddDiscount', body: {
       "discountPercentage": event.discountPercentage,
-      "startDate": event.startDate.toString(),
-      "endDate": event.endDate.toString(),
+      "startDate": event.startDate.toIso8601String(),
+      "endDate": event.endDate.toIso8601String(),
     }).then((response) {
       log(response.data.toString());
+      add(GetAllDiscountsEvent());
       emit(
         state.copyWith(
           adminTransactionStatus: AdminTransactionStatus.success,
@@ -636,10 +657,11 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       );
     }).catchError((error) {
       log(error.toString());
+      log(error.response.toString());
       emit(
         state.copyWith(
           adminTransactionStatus: AdminTransactionStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -661,18 +683,41 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       ),
     );
     // TODO image
-    await ApiService.postMethod(endPoint: 'Product', body: {
-      "price": event.price,
-      "name": event.name,
-      "description": event.description,
-      "categoryId" : event.categoryId,
-      "gender" : event.gender,
-      "quantity" : event.quantity,
-      "type" : event.type,
-      "season" : event.season,
-      "rating" : 0,
-      "styleCloth" : event.styleCloth,
-    }).then((response) {
+
+    String fileName = event.image!.path.split('/').last;
+    String mimeType = mime(fileName) ?? '';
+    String mimee = mimeType.split('/')[0];
+    String type = mimeType.split('/')[1];
+    await ApiService.postMethod(
+        endPoint: 'Auth/UploadUserImage',
+        form: FormData.fromMap({
+          "file": await MultipartFile.fromFile(
+            event.image!.path,
+            filename: fileName,
+            contentType: MediaType(mimee, type),
+          ),
+        })).then((response) async {
+      String url = response.data['url'];
+
+      Map<String , dynamic> data = {
+        "price": event.price,
+        "name": event.name,
+        "description": event.description,
+        "categoryId" : event.categoryId,
+        "gender" : event.gender,
+        "imageUrl" : url,
+        "quantity" : event.quantity,
+        "type" : event.type,
+        "season" : event.season,
+        "rating" : 0,
+        "styleCloth" : event.styleCloth,
+        "size" : event.size,
+        "color" : event.color,
+      };
+      if(event.discountId != null){
+        data['discountSettingId'] = event.discountId;
+      }
+    await ApiService.postMethod(endPoint: 'Product', body: data).then((response) {
       log(response.data.toString());
       add(GetProductsByCategoryEvent(categoryId: event.categoryId));
       emit(
@@ -682,10 +727,11 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       );
     }).catchError((error) {
       log(error.toString());
+      log(error.response.toString());
       emit(
         state.copyWith(
           adminTransactionStatus: AdminTransactionStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -693,6 +739,193 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           adminTransactionStatus: AdminTransactionStatus.failure,
+          errorMessage: "حدث خطأ ما!",
+        ),
+      );
+    });
+
+  }).catchError((error) {
+      log(error.toString());
+      emit(
+        state.copyWith(
+          adminTransactionStatus: AdminTransactionStatus.failure,
+          errorMessage: error.response.toString(),
+        ),
+      );
+    }).onError((error, stackTrace) {
+      print(error);
+      emit(
+        state.copyWith(
+          adminTransactionStatus: AdminTransactionStatus.failure,
+          errorMessage: "حدث خطأ ما!",
+        ),
+      );
+    });
+    }
+
+  FutureOr<void> _onEditProductEvent(EditProductEvent event, Emitter<ProductsState> emit)  async {
+    emit(
+      state.copyWith(
+        adminTransactionStatus: AdminTransactionStatus.loading,
+      ),
+    );
+
+    Map<String, dynamic> data = {
+      "id": event.id,
+      "price": event.price,
+      "name": event.name,
+      "description": event.description,
+      "categoryId": event.categoryId,
+      "gender": event.gender,
+      "quantity": event.quantity,
+      "type": event.type,
+      "season": event.season,
+      "styleCloth": event.styleCloth,
+      "image": event.image == null ? event.imageUrl : "",
+    };
+    if (event.discountId != null) {
+      data['discountSettingId'] = event.discountId;
+    }
+if(event.image == null){
+  await ApiService.putMethod(endPoint: 'Product', body: {
+    "id": event.id,
+    "price": event.price,
+    "name": event.name,
+    "description": event.description,
+    "categoryId": event.categoryId,
+    "gender": event.gender,
+    "quantity": event.quantity,
+    "type": event.type,
+    "season": event.season,
+    "styleCloth": event.styleCloth,
+    "image":  event.imageUrl,
+  }).then((response) {
+    log(response.data.toString());
+    add(GetProductsByCategoryEvent(categoryId: event.categoryId));
+    emit(
+      state.copyWith(
+        adminTransactionStatus: AdminTransactionStatus.success,
+      ),
+    );
+  }).catchError((error) {
+    log(error.toString());
+    emit(
+      state.copyWith(
+        adminTransactionStatus: AdminTransactionStatus.failure,
+        errorMessage: error.response.toString(),
+      ),
+    );
+  }).onError((error, stackTrace) {
+    print(error);
+    emit(
+      state.copyWith(
+        adminTransactionStatus: AdminTransactionStatus.failure,
+        errorMessage: "حدث خطأ ما!",
+      ),
+    );
+  });
+  return;
+}
+    String fileName = event.image!
+        .path
+        .split('/')
+        .last;
+    String mimeType = mime(fileName) ?? '';
+    String mimee = mimeType.split('/')[0];
+    String type = mimeType.split('/')[1];
+    await ApiService.postMethod(
+        endPoint: 'Auth/UploadUserImage',
+        form: FormData.fromMap({
+          "file": await MultipartFile.fromFile(
+            event.image!.path,
+            filename: fileName,
+            contentType: MediaType(mimee, type),
+          ),
+        })).then((response) async {
+      String url = response.data['url'];
+      await ApiService.putMethod(endPoint: 'Product', body: {
+        "id": event.id,
+        "price": event.price,
+        "name": event.name,
+        "description": event.description,
+        "categoryId": event.categoryId,
+        "gender": event.gender,
+        "quantity": event.quantity,
+        "type": event.type,
+        "season": event.season,
+        "styleCloth": event.styleCloth,
+        "image": event.image == null ? event.imageUrl : url,
+      }).then((response) {
+        log(response.data.toString());
+        add(GetProductsByCategoryEvent(categoryId: event.categoryId));
+        emit(
+          state.copyWith(
+            adminTransactionStatus: AdminTransactionStatus.success,
+          ),
+        );
+      }).catchError((error) {
+        log(error.toString());
+        emit(
+          state.copyWith(
+            adminTransactionStatus: AdminTransactionStatus.failure,
+            errorMessage: error.response.toString(),
+          ),
+        );
+      }).onError((error, stackTrace) {
+        print(error);
+        emit(
+          state.copyWith(
+            adminTransactionStatus: AdminTransactionStatus.failure,
+            errorMessage: "حدث خطأ ما!",
+          ),
+        );
+      });
+    }).catchError((error) {
+      log(error.toString());
+      emit(
+        state.copyWith(
+          adminTransactionStatus: AdminTransactionStatus.failure,
+          errorMessage: error.response.toString(),
+        ),
+      );
+    }).onError((error, stackTrace) {
+      print(error);
+      emit(
+        state.copyWith(
+          adminTransactionStatus: AdminTransactionStatus.failure,
+          errorMessage: "حدث خطأ ما!",
+        ),
+      );
+    });
+  }
+
+  FutureOr<void> _onDeleteReviewEvent(DeleteReviewEvent event, Emitter<ProductsState> emit)  async{
+    emit(
+      state.copyWith(addProductReviewStatus: AddProductReviewStatus.loading),
+    );
+    await ApiService.deleteMethod(
+      endPoint: 'Comment/${event.reviewId}',
+    ).then((response) {
+      log(response.data.toString());
+      add(GetProductReviewsEvent(productId: event.productId));
+      emit(
+        state.copyWith(
+          addProductReviewStatus: AddProductReviewStatus.success,
+        ),
+      );
+    }).catchError((error) {
+      log(error.toString());
+      emit(
+        state.copyWith(
+          addProductReviewStatus: AddProductReviewStatus.failure,
+          errorMessage: error.response.toString(),
+        ),
+      );
+    }).onError((error, stackTrace) {
+      print(error);
+      emit(
+        state.copyWith(
+          addProductReviewStatus: AddProductReviewStatus.failure,
           errorMessage: "حدث خطأ ما!",
         ),
       );
@@ -700,31 +933,104 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
   }
 
-  FutureOr<void> _onEditProductEvent(EditProductEvent event, Emitter<ProductsState> emit)  async{
+  FutureOr<void> _onEditReviewToProductEvent(EditReviewToProductEvent event, Emitter<ProductsState> emit) async{
+    emit(
+      state.copyWith(addProductReviewStatus: AddProductReviewStatus.loading),
+    );
+    await ApiService.putMethod(
+
+      endPoint: 'Comment/UpdateComment/${event.reviewId}',
+      bodyAsString: jsonEncode(event.comment),
+    ).then((response) {
+      log(response.data.toString());
+      add(GetProductReviewsEvent(productId: event.productId));
+      emit(
+        state.copyWith(
+          addProductReviewStatus: AddProductReviewStatus.success,
+        ),
+      );
+    }).catchError((error) {
+      log(error.toString());
+      emit(
+        state.copyWith(
+          addProductReviewStatus: AddProductReviewStatus.failure,
+          errorMessage: error.response.toString(),
+        ),
+      );
+    }).onError((error, stackTrace) {
+      print(error);
+      emit(
+        state.copyWith(
+          addProductReviewStatus: AddProductReviewStatus.failure,
+          errorMessage: "حدث خطأ ما!",
+        ),
+      );
+    });
+
+  }
+
+  FutureOr<void> _onFilteringEvent(FilteringEvent event, Emitter<ProductsState> emit) async{
+    emit(state.copyWith(searchProductsStatus: SearchProductsStatus.loading));
+    Map<String , dynamic> data = {};
+    if(event.min != null){
+      data['minPrice'] = event.min;
+    }
+    if(event.max != null){
+      data['maxPrice'] = event.max;
+    }
+    if(event.style != null){
+      data['styleCloth'] = event.style;
+    }
+    if(event.size != null){
+      data['size'] = event.size;
+    }
+    if(event.color != null){
+      data['color'] = event.color;
+    }
+    await ApiService.postMethod(
+        endPoint: 'Product/SearchProductsAdvanced',
+      body: data
+        ).then((response) {
+      log(response.data.toString());
+      emit(
+        state.copyWith(
+          searchProductsStatus: SearchProductsStatus.success,
+          searchResult: productsResponseModelFromJson(response.data),
+        ),
+      );
+    }).catchError((error) {
+      log(error.toString());
+      log(error.response.data.toString());
+      emit(
+        state.copyWith(
+          searchProductsStatus: SearchProductsStatus.failure,
+          errorMessage: error.response.toString(),
+        ),
+      );
+    }).onError((error, stackTrace) {
+      print(error);
+      emit(
+        state.copyWith(
+          searchProductsStatus: SearchProductsStatus.failure,
+          errorMessage: "حدث خطأ ما!",
+        ),
+      );
+    });
+
+  }
+
+  FutureOr<void> _onGetAllDiscountsEvent(GetAllDiscountsEvent event, Emitter<ProductsState> emit)  async{
     emit(
       state.copyWith(
         adminTransactionStatus: AdminTransactionStatus.loading,
       ),
     );
-    // TODO image
-    await ApiService.putMethod(endPoint: 'Product', body: {
-      "id": event.id,
-      "price": event.price,
-      "name": event.name,
-      "description": event.description,
-      "categoryId" : event.categoryId,
-      "gender" : event.gender,
-      "quantity" : event.quantity,
-      "type" : event.type,
-      "season" : event.season,
-      "styleCloth" : event.styleCloth,
-      "image" : event.image == null ? event.imageUrl : "",
-    }).then((response) {
+    await ApiService.getMethod(endPoint: 'Product/GetAllDiscount').then((response) {
       log(response.data.toString());
-      add(GetProductsByCategoryEvent(categoryId: event.categoryId));
       emit(
         state.copyWith(
           adminTransactionStatus: AdminTransactionStatus.success,
+          discounts: discountsResponseModelFromJson(response.data)
         ),
       );
     }).catchError((error) {
@@ -732,7 +1038,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(
         state.copyWith(
           adminTransactionStatus: AdminTransactionStatus.failure,
-          errorMessage: error.response.data['message'],
+          errorMessage: error.response.toString(),
         ),
       );
     }).onError((error, stackTrace) {
@@ -744,5 +1050,42 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         ),
       );
     });
+  }
+
+  FutureOr<void> _onDeleteDiscountEvent(DeleteDiscountEvent event, Emitter<ProductsState> emit) async{
+    emit(
+      state.copyWith(
+        adminTransactionStatus: AdminTransactionStatus.loading,
+      ),
+    );
+    await ApiService.deleteMethod(endPoint: 'Product/DeleteDiscount' , queryParameters: {
+      "id": event.id.toString()
+    }).then((response) {
+      log(response.data.toString());
+      add(GetAllDiscountsEvent());
+      emit(
+        state.copyWith(
+          adminTransactionStatus: AdminTransactionStatus.success,
+
+        ),
+      );
+    }).catchError((error) {
+      log(error.toString());
+      emit(
+        state.copyWith(
+          adminTransactionStatus: AdminTransactionStatus.failure,
+          errorMessage: error.response.toString(),
+        ),
+      );
+    }).onError((error, stackTrace) {
+      print(error);
+      emit(
+        state.copyWith(
+          adminTransactionStatus: AdminTransactionStatus.failure,
+          errorMessage: "حدث خطأ ما!",
+        ),
+      );
+    });
+
   }
 }

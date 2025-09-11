@@ -99,6 +99,12 @@ class MySharedPref {
   static String? getPhone() =>
       _sharedPreferences.getString(phone);
 
+  static Future<bool>? setImage(String url) =>
+      _sharedPreferences.setString('image' , url);
+
+  static String? getImage() =>
+      _sharedPreferences.getString('image');
+
   // ---------------- FAVORITES ---------------- //
 
   /// Add product to favorites

@@ -29,8 +29,14 @@ class UpdateItemInCartEvent extends CartEvent {
   });
 }
 
-
 class CheckOutEvent extends CartEvent {
 
-  CheckOutEvent();
+  final String location;
+  CheckOutEvent({required this.location});
+}
+
+class RemoveFromCart extends CartEvent {
+
+  final int id;
+  RemoveFromCart({required this.id});
 }

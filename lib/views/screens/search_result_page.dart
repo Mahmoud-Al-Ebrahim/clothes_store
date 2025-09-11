@@ -11,9 +11,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/products_bloc/products_bloc.dart';
 
 class SearchResultPage extends StatefulWidget {
-  final String searchKeyword;
+  final String? searchKeyword;
 
-  SearchResultPage({required this.searchKeyword});
+  SearchResultPage({ this.searchKeyword});
 
   @override
   _SearchResultPageState createState() => _SearchResultPageState();
@@ -21,18 +21,18 @@ class SearchResultPage extends StatefulWidget {
 
 class _SearchResultPageState extends State<SearchResultPage>
     with TickerProviderStateMixin {
-  late final TabController tabController;
   TextEditingController searchInputController = TextEditingController();
   List<Product> searchedProductData = ProductService.searchedProductData;
 
   @override
   void initState() {
-    BlocProvider.of<ProductsBloc>(
-      context,
-    ).add(SearchProductsEvent(text: widget.searchKeyword));
-    super.initState();
-    searchInputController.text = widget.searchKeyword;
-    tabController = TabController(length: 4, vsync: this);
+    if(widget.searchKeyword != null) {
+      BlocProvider.of<ProductsBloc>(
+        context,
+      ).add(SearchProductsEvent(text: widget.searchKeyword!));
+      searchInputController.text = widget.searchKeyword!;
+    }
+      super.initState();
   }
 
   @override
@@ -109,7 +109,7 @@ class _SearchResultPageState extends State<SearchResultPage>
                   Padding(
                     padding: EdgeInsets.only(right: 16, top: 16),
                     child: Text(
-                      'نتائج البحث ل ${widget.searchKeyword}',
+                      'نتائج البحث ل${searchInputController.text.isEmpty ? 'لفلترة' : ' ${searchInputController.text}'}',
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 12,

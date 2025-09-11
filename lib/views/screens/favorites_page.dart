@@ -54,12 +54,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: List.generate(
-            favorites.length,
-            (index) => ItemCard(product: favorites[index]),
+        child: SingleChildScrollView(
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: List.generate(
+              favorites.length,
+              (index) => ItemCard(product: favorites[index]),
+            ),
           ),
         ),
       ),

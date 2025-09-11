@@ -54,12 +54,14 @@ class _LastSeenProductsPageState extends State<LastSeenProductsPage> {
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: List.generate(
-            lastSeenList.length,
-            (index) => ItemCard(product: lastSeenList[index]),
+        child: SingleChildScrollView(
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: List.generate(
+              lastSeenList.length,
+              (index) => ItemCard(product: lastSeenList[index]),
+            ),
           ),
         ),
       ),

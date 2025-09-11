@@ -30,7 +30,10 @@ class _ProductDetailState extends State<ProductDetail> {
 
   @override
   void initState() {
-    BlocProvider.of<ProductsBloc>(context).add(GetProductReviewsEvent(productId: widget.product.id!));
+    BlocProvider.of<ProductsBloc>(context)
+        .add(GetProductReviewsEvent(productId: widget.product.id!));
+    BlocProvider.of<ProductsBloc>(context)
+        .add(GetProductByIdEvent(productId: widget.product.id!));
     super.initState();
     MySharedPref.saveLastSeen(widget.product);
   }
@@ -67,9 +70,12 @@ class _ProductDetailState extends State<ProductDetail> {
                       backgroundColor: Colors.transparent,
                       builder: (context) {
                         return AddToCartModal(
-                          price: product.discountPercentage ?? product.price!,
+                          price: product.discountPercentage ??
+                              product.price ??
+                              product.discountedPrice ??
+                              product.orginalPrice!,
                           productId: product.id!,
-                          isForShose: product.categoryName?.contains('Shose') ?? false,
+                          isForShose: false,
                         );
                       },
                     );
@@ -102,9 +108,8 @@ class _ProductDetailState extends State<ProductDetail> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder:
-                          (context) =>
-                              ImageViewer(imageUrl: [product.imageUrl!]),
+                      builder: (context) =>
+                          ImageViewer(imageUrl: [product.imageUrl!]),
                     ),
                   );
                 },
@@ -125,25 +130,25 @@ class _ProductDetailState extends State<ProductDetail> {
               ),
               // appbar
               CustomAppBar(
-                title: '${product.categoryName}',
-                leftIcon: SvgPicture.asset('assets/icons/Arrow-left.svg'),
-                rightIcon: Center(
-                  child: Icon(
+                  title:
+                      '${product.categoryName ?? product.styleCloth ?? product.type}',
+                  leftIcon: SvgPicture.asset('assets/icons/Arrow-left.svg'),
+                  rightIcon: Center(
+                    child: Icon(
                       MySharedPref.isFavorite(widget.product.id.toString())
-                      ? Icons.favorite
+                          ? Icons.favorite
                           : Icons.favorite_border,
                       color: Colors.red,
-                      ),
-                ),
-                leftOnTap: () {
-                  Navigator.of(context).pop();
-                },
-                rightOnTap: () async {
-                  await MySharedPref.toggleFavorite(widget.product);
-                  setState(() {});
-                  // Optionally: setState(() {}); if inside a StatefulWidget to update UI
-                }
-              ),
+                    ),
+                  ),
+                  leftOnTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  rightOnTap: () async {
+                    await MySharedPref.toggleFavorite(widget.product);
+                    setState(() {});
+                    // Optionally: setState(() {}); if inside a StatefulWidget to update UI
+                  }),
               // indicator
               Positioned(
                 bottom: 16,
@@ -191,18 +196,61 @@ class _ProductDetailState extends State<ProductDetail> {
                     ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(bottom: 14),
-                  child: Text(
-                    '${product.price}ل.س ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'poppins',
-                      color: AppColor.primary,
-                    ),
-                  ),
+                Row(
+                  spacing: 5,
+                  children: [
+                    if (widget.product.orginalPrice != null) ...{
+                      Text(
+                        '${widget.product.orginalPrice}ل.س ',
+                        style: TextStyle(
+                          fontSize: 10,
+                          decoration: TextDecoration.lineThrough,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      Text(
+                        '${widget.product.discountedPrice}ل.س ',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    } else if (widget.product.price !=
+                        widget.product.discountPercentage) ...{
+                      Text(
+                        '${widget.product.price}ل.س ',
+                        style: TextStyle(
+                          fontSize: 10,
+                          decoration: widget.product.discountPercentage ==null  ? null : TextDecoration.lineThrough,
+                          fontWeight: FontWeight.w700,
+                          decorationStyle: TextDecorationStyle.solid,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      if(widget.product.discountPercentage !=null)
+                        Text(
+                          '${widget.product.discountPercentage}ل.س ',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Poppins',
+                          ),),
+                    } else ...{
+                      Text(
+                        '${widget.product.price}ل.س ',
+                        style: TextStyle(
+                          fontSize: 10,
+                          decoration: TextDecoration.overline,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    }
+                  ],
                 ),
+                if(product.description != null)
                 Text(
                   '${product.description}',
                   style: TextStyle(
@@ -218,90 +266,179 @@ class _ProductDetailState extends State<ProductDetail> {
           BlocBuilder<ProductsBloc, ProductsState>(
             builder: (context, state) {
               return state.getProductReviewsStatus ==
-                      GetProductReviewsStatus.loading
+                      GetProductReviewsStatus.loading || state.addProductReviewStatus ==
+                  AddProductReviewStatus.loading
                   ? FashionLoader()
                   : Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ExpansionTile(
-                          initiallyExpanded: true,
-                          childrenPadding: EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: 0,
-                          ),
-                          tilePadding: EdgeInsets.symmetric(
-                            vertical: 0,
-                            horizontal: 0,
-                          ),
-                          title: Text(
-                            'آراء العملاء',
-                            style: TextStyle(
-                              color: AppColor.secondary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'poppins',
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ExpansionTile(
+                            initiallyExpanded: true,
+                            childrenPadding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 0,
                             ),
-                          ),
-                          expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListView.separated(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder:
-                                  (context, index) => ReviewTile(
-                                    review: state.productReviewsResponseModel![index],
-                                  ),
-                              separatorBuilder:
-                                  (context, index) => SizedBox(height: 16),
-                              itemCount: min(2 , state.productReviewsResponseModel?.length ?? 0),
+                            tilePadding: EdgeInsets.symmetric(
+                              vertical: 0,
+                              horizontal: 0,
                             ),
-                            if((state.productReviewsResponseModel?.length?? 0 )  > 0)Container(
-                              margin: EdgeInsets.only(
-                                right: 52,
-                                top: 12,
-                                bottom: 6,
-                              ),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => ReviewsPage(
-                                            reviews: state.productReviewsResponseModel ?? [],
-                                          ),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: AppColor.primary,
-                                  elevation: 0,
-                                  backgroundColor: AppColor.primarySoft,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  'مشاهدة جميع الآراء',
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'آراء العملاء',
                                   style: TextStyle(
                                     color: AppColor.secondary,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w600,
+                                    fontFamily: 'poppins',
                                   ),
                                 ),
-                              ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    showAddCommentDialog(
+                                      context,
+                                      (text) {
+                                        BlocProvider.of<ProductsBloc>(context)
+                                            .add(AddReviewToProductEvent(
+                                                productId: widget.product.id!,
+                                                comment: text));
+                                      },
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: AppColor.primary,
+                                    elevation: 0,
+                                    backgroundColor: AppColor.primarySoft,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                      radius: 15,
+                                      backgroundColor: AppColor.primarySoft,
+
+                                      child: Center(child: Icon(Icons.add))),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              ListView.separated(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) => ReviewTile(
+                                  productId: widget.product.id!,
+                                  review:
+                                      state.productReviewsResponseModel![index],
+                                ),
+                                separatorBuilder: (context, index) =>
+                                    SizedBox(height: 16),
+                                itemCount: min(
+                                    2,
+                                    state.productReviewsResponseModel?.length ??
+                                        0),
+                              ),
+                              if ((state.productReviewsResponseModel?.length ??
+                                      0) >
+                                  0)
+                                Container(
+                                  margin: EdgeInsets.only(
+                                    right: 52,
+                                    top: 12,
+                                    bottom: 6,
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => ReviewsPage(
+                                             productId: widget.product.id!,
+                                            reviews: state
+                                                    .productReviewsResponseModel ??
+                                                [],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: AppColor.primary,
+                                      elevation: 0,
+                                      backgroundColor: AppColor.primarySoft,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'مشاهدة جميع الآراء',
+                                      style: TextStyle(
+                                        color: AppColor.secondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
             },
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> showAddCommentDialog(
+      BuildContext context, Function(String) onSubmit,
+      {String? comment}) async {
+    TextEditingController _commentController =
+        TextEditingController(text: comment ?? '');
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('إضافة تعليق'),
+          content: TextField(
+            controller: _commentController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'اكتب رأيك هنا...',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final comment = _commentController.text.trim();
+                if (comment.isNotEmpty) {
+                  onSubmit(comment); // Call the callback
+                  Navigator.of(context).pop(); // Close dialog
+                } else {
+                  // Optionally show an error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('التعليق لايجب أن يكون فارغاً')),
+                  );
+                }
+              },
+              child: Text('حفظ'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

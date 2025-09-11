@@ -6,12 +6,35 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/screens/login_page.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(
+      Duration(seconds: 3),
+      () {
+        String? token = MySharedPref.getToken();
+        bool? isAdmin = MySharedPref.getIsAdmin() ?? false;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => token != null
+                  ? (isAdmin ? ProductsPage() : PageSwitcher())
+                  : LoginPage()));
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Column(
@@ -40,34 +63,33 @@ class WelcomePage extends StatelessWidget {
                 ),
                 Text(
                   'أحدث صيحات الموضة بين يديك, رفيقك لتبدو بأفضل مايمكن في جميع المناسبات',
-                  style: TextStyle(color: AppColor.secondary.withOpacity(0.7), fontSize: 16),
+                  style: TextStyle(
+                      color: AppColor.secondary.withOpacity(0.7), fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ],
             ),
             // Section 3 - Get Started Button
-            Container(
-              width: MediaQuery.of(context).size.width,
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              margin: EdgeInsets.only(bottom: 16),
-              child: ElevatedButton(
-                onPressed: () {
-                  String? token = MySharedPref.getToken();
-                  bool? isAdmin = MySharedPref.getIsAdmin() ?? false;
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => token != null ? (isAdmin ? ProductsPage() : PageSwitcher()) :  LoginPage()));
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18), backgroundColor: AppColor.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 0,
-                  shadowColor: Colors.transparent,
-                ),
-                child: Text(
-                  'ابدأ',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'poppins'),
-                ),
-              ),
-            ),
+            // Container(
+            //   width: MediaQuery.of(context).size.width,
+            //   padding: EdgeInsets.symmetric(horizontal: 16),
+            //   margin: EdgeInsets.only(bottom: 16),
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18), backgroundColor: AppColor.primary,
+            //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            //       elevation: 0,
+            //       shadowColor: Colors.transparent,
+            //     ),
+            //     child: Text(
+            //       'ابدأ',
+            //       style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'poppins'),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

@@ -101,7 +101,21 @@ class _OrdersPageState extends State<OrdersPage> {
                             if (item.discountedPrice != null)
                               Text("السعر المخفض: \$${item.discountedPrice}"),
                             if (item.size != null) Text("القياس: ${item.size}"),
-                            if (item.color != null) Text("اللون: ${item.color}"),
+                            if (item.color != null) Row(
+                              spacing: 10,
+                              children: [
+                                Text("اللون: "),
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                      color: Color(int.parse('0xff${item.color?.substring(1)}')),
+                                      border: Border.all(color: Colors.black  ,width: 0.5),
+                                      shape: BoxShape.circle
+                                  ),
+                                )
+                              ],
+                            ),
                             if (item.imageUrl != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),

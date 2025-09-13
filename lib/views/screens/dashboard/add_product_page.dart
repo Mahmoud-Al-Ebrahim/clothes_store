@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:clothes_store/models/products_response_model.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +29,48 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
   late TextEditingController _quantityController;
   late TextEditingController _discountController;
   late TextEditingController _sizeController;
-  late TextEditingController _colorController;
   late final ValueNotifier<int> currentSelected;
+
+
+  Color selectedColor = Colors.blue;
+  String rgbHex = '#000000'; // Default
+
+
+  String colorToHex(Color color) {
+    return '#${color.red.toRadixString(16).padLeft(2, '0')}'
+        '${color.green.toRadixString(16).padLeft(2, '0')}'
+        '${color.blue.toRadixString(16).padLeft(2, '0')}'
+        .toUpperCase();
+  }
+
+  void pickColor() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('اختر لون'),
+        content: SingleChildScrollView(
+          child: ColorPicker(
+            pickerColor: selectedColor,
+            onColorChanged: (Color color) {
+              setState(() {
+                selectedColor = color;
+                rgbHex = colorToHex(color); // Save as #RRGGBB
+                print('hhhh $rgbHex');
+              });
+            },
+            enableAlpha: false, // No transparency
+            displayThumbColor: true,
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: Text('تم'),
+            onPressed: () => Navigator.of(context).pop(),
+          )
+        ],
+      ),
+    );
+  }
 
   File? _imageFile;
   String? _gender;
@@ -52,7 +93,6 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
         TextEditingController(text: widget.product?.name ?? "");
     _discountController =  TextEditingController();
     _sizeController =  TextEditingController();
-    _colorController =  TextEditingController();
     _descriptionController =
         TextEditingController(text: widget.product?.description ?? "");
     _priceController =
@@ -86,7 +126,7 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
         gender: _gender ?? "",
         season: _season ?? "",
         type: _type ?? "",
-        color: _colorController.text,
+        color: rgbHex,
         size: _sizeController.text,
         styleCloth: _styleCloth ?? "",
       ));
@@ -257,10 +297,9 @@ class _AddEditProductPageState extends State<AddEditProductPage> {
               ),
 
               if (widget.product == null) ...{
-                TextFormField(
-                  controller: _colorController,
-                  decoration: const InputDecoration(labelText: "اللون"),
-                  keyboardType: TextInputType.text,
+                ElevatedButton(
+                  onPressed: pickColor,
+                  child: Text('اختر لون'),
                 ),
                 TextFormField(
                   controller: _sizeController,

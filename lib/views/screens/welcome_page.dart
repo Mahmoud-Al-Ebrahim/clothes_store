@@ -18,15 +18,13 @@ class _WelcomePageState extends State<WelcomePage> {
 
     Future.delayed(
       Duration(seconds: 3),
-      () {
+          () {
         String? token = MySharedPref.getToken();
         bool? isAdmin = MySharedPref.getIsAdmin() ?? false;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => token != null
                   ? (isAdmin ? ProductsPage() : PageSwitcher())
                   : LoginPage()));
-        });
       },
     );
   }
@@ -38,7 +36,8 @@ class _WelcomePageState extends State<WelcomePage> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Section 1 - Illustration
             Container(
@@ -48,6 +47,7 @@ class _WelcomePageState extends State<WelcomePage> {
             ),
             // Section 2 - clothes_store with Caption
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   margin: EdgeInsets.only(bottom: 12),

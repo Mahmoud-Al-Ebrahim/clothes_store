@@ -244,7 +244,7 @@ class _LoginPageState extends State<LoginPage> {
             listener: (context, state) {
               if (state.loginStatus == LoginStatus.success) {
                 bool isAdmin = BlocProvider.of<AuthBloc>(context).userModel?.user?.isAdmin ?? false;
-                MySharedPref.saveIsAdmin(true);
+                MySharedPref.saveIsAdmin(isAdmin);
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (ctx) =>  isAdmin ? ProductsPage() : PageSwitcher()),
                   (route) => false,

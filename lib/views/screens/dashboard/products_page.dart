@@ -13,6 +13,11 @@ import 'package:clothes_store/views/screens/search_page.dart';
 import 'package:clothes_store/views/widgets/category_card.dart';
 import 'package:clothes_store/views/widgets/dummy_search_widget_1.dart';
 import 'package:clothes_store/views/widgets/item_card.dart';
+import 'package:flutter_svg/svg.dart';
+
+import '../../../main.dart';
+import '../../../utils/api_service.dart';
+import '../../../utils/my_shared_pref.dart';
 
 class ProductsPage extends StatefulWidget {
   @override
@@ -55,6 +60,39 @@ class _ProductsPageState extends State<ProductsPage> {
             );
           },
           child: Icon(Icons.percent),
+        ),
+            FloatingActionButton(
+          onPressed: () async {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("هل انت متأكد أنك تريد تسجيل الخروج؟"),
+                    actions: [
+                      TextButton(
+                          onPressed: () async {
+                            await MySharedPref.clear();
+                            ApiService.init();
+                            Navigator.of(context, rootNavigator: true).pushReplacement(
+                              MaterialPageRoute(builder: (_) => MyApp()),
+                            );
+                          },
+                          child: Text("نعم")),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("لا"),
+                      ),
+                    ],
+                  );
+
+                });
+          },
+          child: SvgPicture.asset(
+            'assets/icons/Log Out.svg',
+            color: Colors.red,
+          ),
         )
       ]),
       body: ListView(

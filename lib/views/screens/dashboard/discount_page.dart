@@ -76,7 +76,7 @@ class DiscountPage extends StatelessWidget {
                             startDate = picked;
                           });
                         }
-                      },
+                      },''
                     ),
                     ListTile(
                       title: Text(

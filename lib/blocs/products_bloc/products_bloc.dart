@@ -645,8 +645,8 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     );
     await ApiService.postMethod(endPoint: 'Product/AddDiscount', body: {
       "discountPercentage": event.discountPercentage,
-      "startDate": event.startDate.toIso8601String(),
-      "endDate": event.endDate.toIso8601String(),
+      "startDate": event.startDate.toUtc().toIso8601String(),
+      "endDate": event.endDate.toUtc().toIso8601String(),
     }).then((response) {
       log(response.data.toString());
       add(GetAllDiscountsEvent());

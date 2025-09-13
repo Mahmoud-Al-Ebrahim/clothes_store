@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:clothes_store/constant/app_color.dart';
 import 'package:clothes_store/views/screens/cart_page.dart';
 
+import '../../../utils/my_shared_pref.dart';
 import '../../../utils/show_message.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -201,7 +202,8 @@ class _AddToCartModalState extends State<AddToCartModal> {
                                   .map((color) {
                                 final isSelected = selectedColor == color;
                                 return ChoiceChip(
-                                  label: Container(
+                                  label: int.tryParse(
+                                      '0xff${color.substring(1)}') == null ? Text(color) : Container(
                                     width: 25,
                                     height: 25,
                                     decoration: BoxDecoration(
@@ -269,7 +271,7 @@ class _AddToCartModalState extends State<AddToCartModal> {
                       ),
                     ),
                   ),
-                  Expanded(
+                  if(!(MySharedPref.getIsAdmin() ?? false))Expanded(
                     flex: 6,
                     child: ElevatedButton(
                       onPressed: () {

@@ -81,7 +81,7 @@ class _ProductDetailState extends State<ProductDetail> {
                     );
                   },
                   child: Text(
-                    'الإضافة للسلة',
+                      (MySharedPref.getIsAdmin() ?? false) ? 'معلومات عن المنتج' : 'الإضافة للسلة',
                     style: TextStyle(
                       fontFamily: 'poppins',
                       fontWeight: FontWeight.w600,

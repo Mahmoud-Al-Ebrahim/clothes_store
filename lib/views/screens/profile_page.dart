@@ -172,7 +172,7 @@ showDialog(
                             actions: [
                               TextButton(
                                   onPressed: () async {
-                                        MySharedPref.clear();
+                                       await MySharedPref.clear();
                     ApiService.init();
                     Navigator.of(context, rootNavigator: true).pushReplacement(
                       MaterialPageRoute(builder: (_) => MyApp()),
